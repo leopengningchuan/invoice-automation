@@ -33,10 +33,12 @@ The visual layout of the invoice—such as the company logo, table formatting, a
 
 - `inv_info.xlsx`
 This is the base Excel file contains structured invoice data. Each row represents one invoice, with columns corresponding to invoice fields:
+
 | Invoice No. |  Customer  | Customer Address1 |    Customer Address2   | Invoice Date | Payment Terms |    Item   |       Detail      |               Unit Price               | Quantity |
 |:-----------:|:----------:|:-----------------:|:----------------------:|:------------:|:-------------:|:---------:|:-----------------:|:--------------------------------------:|:--------:|
 |   SAMCO_1   | Customer A |    123 ABC St.    |  Town_A, State_I 10001 |  2024/12/31  |       30      | Product 1 | Product 1 details |                                  9.00  |    170   |
 |   SAMCO_2   | Customer B |  Unit 1, 456 Ave. | City_B, State_II 20002 |   2025/1/11  |       90      | Product 7 | Product 7 details |                               69.00    |    302   |
+
 The program reads this data row by row and fills the template accordingly to generate one PDF file per invoice.
 
 ### 3. Parse the Information
