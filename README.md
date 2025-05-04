@@ -48,11 +48,54 @@ The program processes each row from the Excel file and converts it into a struct
 Using the invoice dictionary, the script replaces all matching placeholders in the Word template with actual data. This dynamic substitution generates a personalized invoice Word file for each entry, preserving the original layout and formatting defined in the template.
 The generated Word invoice is saved as a new file, while the original template remains unchanged. This ensures that each new invoice starts from a clean, unaltered template for consistent formatting and accurate substitutions.
 
+> [!NOTE]  
+> Handling Placeholder Substitution Issues in Word Templates
+
+> When using Word templates for invoice generation, placeholders like UNITPRICE1 may not always be stored as a single contiguous string. Instead, Word can split them into multiple runs (e.g., UNIT, PRICE, 1), especially if the placeholder is manually typed letter-by-letter or if formatting changes occur mid-text. This makes accurate substitution difficult.
+
+> To address this, there are two possible solutions:
+
+> Best Practice: Always paste the full placeholder (e.g., UNITPRICE1) into the Word template instead of typing it character by character. This helps Word treat it as a single run.
+Programmatic Workaround: Merge all runs in a paragraph into one string, perform substitutions on the combined text, and then rewrite the paragraph with the updated content. However, this method overwrites the original formatting of the paragraph.
+Here’s the code implementation of the workaround:
+
+```python
+# define the function of replacing the template placeholder with invoice information
+def replace_text_in_doc_table(item_dict, docx_template_name):
+
+    # open the template docx
+    doc = Document(docx_template_name)
+
+    # replace the placeholder in the docx for all the invoices information
+    for table in doc.tables:
+        for row in table.rows:
+            for cell in row.cells:
+                for para in cell.paragraphs:
+
+                    # combine all the run as a full text
+                    full_text = ''.join([run.text for run in para.runs])
+
+                    if full_text in item_dict.keys():
+                        full_text = item_dict[full_text]
+
+                    # clear the para
+                    para.clear()
+                    para.add_run(full_text)
+
+    # add the docx path and docx name
+    new_doc_path = item_dict['INV_NO'] + '.docx'
+
+    # save the docx to the docx path
+    doc.save(new_doc_path)
+
+replace_text_in_doc_table(item_dict, 'inv_template.docx')
+```
+
 ### 5. Convert Word Files to PDF Files
 After each invoice is generated as a Word file, it is immediately converted into a PDF file for final output. To keep the workspace clean and prevent duplication, the intermediate Word file is automatically deleted after the PDF is successfully created.
 
 ## License
-This project is licensed under the MIT License - see the [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) file for details.
+This project is licensed under the MIT License - see the [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/leopengningchuan/invoice-automation?tab=MIT-1-ov-file) file for details.
 
 ## Acknowledgements
 - Thanks to Microsoft Word for providing a flexible document format that allows for easy templating.
