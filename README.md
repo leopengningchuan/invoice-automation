@@ -21,9 +21,9 @@ This project aims to automate the generation of company invoices in PDF by using
 
 ### 1. Package Used
 - `pandas, datetime, re`: for data manipulation
-- `os`: for file management
-- `docx`: for using Microsoft Word as a template
-- `docx2pdf`: for converting a Microsoft Word file to a PDF file
+- `os`: for handling file and directory operations, such as saving and deleting file
+- `python-docx`: for enabling reading and editing Word files to populate invoice templates
+- `docx2pdf`: for converting the generated Word files into PDF files for final delivery
 
 ### 2. Invoice Template Word and Invoice Info Excel
 This project uses two key supporting files to generate customized invoices:
@@ -41,20 +41,19 @@ This is the base Excel file contains structured invoice data. Each row represent
 
 The program reads this data row by row and fills the template accordingly to generate one PDF file per invoice.
 
-### 3. Parse the Information
+### 3. Build Invoice Data Dictionary
+The program processes each row from the Excel file and converts it into a structured Python dictionary. Each key in the dictionary corresponds to a placeholder in the Word template (e.g., `CUSTOMER`, `DOC_DATE`, `AMOUNT1`, `TOTAL_AMOUNT`, etc.). This step ensures the data is clean, properly formatted (e.g., currency, dates), and ready for insertion into the template.
 
+### 4. Populate Word Template with Invoice Data
+Using the invoice dictionary, the script replaces all matching placeholders in the Word template with actual data. This dynamic substitution generates a personalized invoice Word file for each entry, preserving the original layout and formatting defined in the template.
+The generated Word invoice is saved as a new file, while the original template remains unchanged. This ensures that each new invoice starts from a clean, unaltered template for consistent formatting and accurate substitutions.
 
-
-
-
-### 4. Convert Word Files to PDF
-After each invoice is generated as a Word document, it is immediately converted into a PDF file for final output. To keep the workspace clean and prevent duplication, the intermediate Word file is automatically deleted after the PDF is successfully created.
-
-
+### 5. Convert Word Files to PDF Files
+After each invoice is generated as a Word file, it is immediately converted into a PDF file for final output. To keep the workspace clean and prevent duplication, the intermediate Word file is automatically deleted after the PDF is successfully created.
 
 ## License
 This project is licensed under the MIT License - see the [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) file for details.
 
 ## Acknowledgements
-- Thanks to [BeautifulSoup](https://www.crummy.com/software/BeautifulSoup/) for web scraping.
-- Thanks to [Douban](https://www.douban.com) for providing the platform.
+- Thanks to Microsoft Word for providing a flexible document format that allows for easy templating.
+- Thanks to the Python community for the powerful libraries that made this project possible, including [`python-docx`](https://pypi.org/project/docx2pdf/) and [`openpyxl`](https://pypi.org/project/docx2pdf/).
