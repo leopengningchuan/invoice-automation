@@ -49,12 +49,12 @@ Using the invoice dictionary, the script replaces all matching placeholders in t
 The generated Word invoice is saved as a new file, while the original template remains unchanged. This ensures that each new invoice starts from a clean, unaltered template for consistent formatting and accurate substitutions.
 
 > [!NOTE]  
-> Handling Placeholder Substitution Issues in Word Templates
+> Handling Placeholder Substitution Issues in Word Template
 
 When using Word templates for invoice generation, placeholders like `UNITPRICE1` may not always be stored as a single contiguous string. Instead, Word can split them into multiple runs (e.g., `UNIT PRICE 1`), especially if the placeholder is manually typed letter-by-letter or if formatting changes occur mid-text. This makes accurate substitution difficult.
 
 To address this, there are two possible solutions:
-- Best Practice: Always paste the full placeholder (e.g., UNITPRICE1) into the Word template instead of typing it character by character. This helps Word treat it as a single run.
+- Best Practice: Always paste the full placeholder (e.g., `UNITPRICE1`) into the Word template instead of typing it character by character. This helps Word treat it as a single run.
 - Programmatic Workaround: Merge all runs in a paragraph into one string, perform substitutions on the combined text, and then rewrite the paragraph with the updated content. However, this method overwrites the original formatting of the paragraph.
 
 Here’s the code implementation of the workaround:
