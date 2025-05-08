@@ -94,6 +94,11 @@ replace_text_in_doc_table(item_dict, 'inv_template.docx')
 ### 5. Convert Word Files to PDF Files
 After each invoice is generated as a Word file, it is immediately converted into a PDF file for final output. To keep the workspace clean and prevent duplication, the intermediate Word file is automatically deleted after the PDF is successfully created.
 
+## Future Improvements
+- **Duplicate Invoice Detection**: Add a check to flag or prevent generation of duplicate invoices based on invoice number or client name.
+- **Web Interface**: Build a lightweight front-end interface to allow non-technical users to upload invoice data and download results without using Jupyter or the command line.
+- **Email Integration**: Add functionality to automatically send generated invoices via email to clients, with customizable messages and attachments.
+
 ## License
 This project is licensed under the MIT License - see the [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/leopengningchuan/invoice-automation?tab=MIT-1-ov-file) file for details.
 
