@@ -49,7 +49,7 @@ The invoice automation process uses `populate_docx_table()` from the `utils.docx
 
 For each invoice entry, the script fills in matching placeholders within table cells and generates a Word invoice. The output preserves the formatting and structure defined in the original template, which remains unchanged to ensure consistent formatting across all invoices.
 
-The `utils/` folder is included as a Git submodule and contains a reusable function library maintained in the `personal_utils`](https://github.com/leopengningchuan/personal_utils). You can refer to that repository for detailed function documentation and personal notes.
+The `utils/` folder is included as a Git submodule and contains a reusable function library maintained in the [`personal_utils`](https://github.com/leopengningchuan/personal_utils). You can refer to that repository for detailed function documentation and personal notes.
 
 ### 5. Convert Word Files to PDF Files
 After each invoice is generated as a Word file, it is immediately converted into a PDF file for final output. To keep the workspace clean and prevent duplication, the intermediate Word file is automatically deleted after the PDF is successfully created.
