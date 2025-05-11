@@ -44,52 +44,12 @@ The program reads this data row by row and fills the template accordingly to gen
 ### 3. Build Invoice Data Dictionary
 The program processes each row from the Excel file and converts it into a structured Python dictionary. Each key in the dictionary corresponds to a placeholder in the Word template (e.g., `CUSTOMER`, `DOC_DATE`, `AMOUNT1`, `TOTAL_AMOUNT`, etc.). This step ensures the data is clean, properly formatted (e.g., currency, dates), and ready for insertion into the template.
 
-### 4. Populate Word Template with Invoice Data
-Using the invoice dictionary, the script replaces all matching placeholders in the Word template with actual data. This dynamic substitution generates a personalized invoice Word file for each entry, preserving the original layout and formatting defined in the template.
-The generated Word invoice is saved as a new file, while the original template remains unchanged. This ensures that each new invoice starts from a clean, unaltered template for consistent formatting and accurate substitutions.
+### 4. Word Invoice Generation with Placeholder Replacement
+The invoice automation process uses `populate_docx_table()` from the `utils.docx_manipulate` module to dynamically replace placeholders in a Word docx template using values from an invoice dictionary.
 
-> [!NOTE]  
-> Handling Placeholder Substitution Issues in Word Template
+For each invoice entry, the script fills in matching placeholders within table cells and generates a Word invoice. The output preserves the formatting and structure defined in the original template, which remains unchanged to ensure consistent formatting across all invoices.
 
-When using Word templates for invoice generation, placeholders like `UNITPRICE1` may not always be stored as a single contiguous string. Instead, Word can split them into multiple runs (e.g., `UNIT PRICE 1`), especially if the placeholder is manually typed letter-by-letter or if formatting changes occur mid-text. This makes accurate substitution difficult.
-
-To address this, there are two possible solutions:
-- Best Practice: Always paste the full placeholder (e.g., `UNITPRICE1`) into the Word template instead of typing it character by character. This helps Word treat it as a single run.
-- Programmatic Workaround: Merge all runs in a paragraph into one string, perform substitutions on the combined text, and then rewrite the paragraph with the updated content. However, this method overwrites the original formatting of the paragraph.
-
-Here’s the code implementation of the workaround:
-
-```python
-# define the function of replacing the template placeholder with invoice information
-def replace_text_in_doc_table(item_dict, docx_template_name):
-
-    # open the template docx
-    doc = Document(docx_template_name)
-
-    # replace the placeholder in the docx for all the invoices information
-    for table in doc.tables:
-        for row in table.rows:
-            for cell in row.cells:
-                for para in cell.paragraphs:
-
-                    # combine all the run as a full text
-                    full_text = ''.join([run.text for run in para.runs])
-
-                    if full_text in item_dict.keys():
-                        full_text = item_dict[full_text]
-
-                    # clear the para
-                    para.clear()
-                    para.add_run(full_text)
-
-    # add the docx path and docx name
-    new_doc_path = item_dict['INV_NO'] + '.docx'
-
-    # save the docx to the docx path
-    doc.save(new_doc_path)
-
-replace_text_in_doc_table(item_dict, 'inv_template.docx')
-```
+The `utils/` folder is included as a Git submodule and contains a reusable function library maintained in the `personal_utils`](https://github.com/leopengningchuan/personal_utils). You can refer to that repository for detailed function documentation and personal notes.
 
 ### 5. Convert Word Files to PDF Files
 After each invoice is generated as a Word file, it is immediately converted into a PDF file for final output. To keep the workspace clean and prevent duplication, the intermediate Word file is automatically deleted after the PDF is successfully created.
