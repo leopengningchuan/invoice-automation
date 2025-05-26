@@ -21,9 +21,7 @@ This project aims to automate the generation of company invoices in PDF by using
 
 ### 1. Package Used
 - `pandas, datetime, re`: for data manipulation
-- `os`: for handling file and directory operations, such as saving and deleting file
-- `python-docx`: for enabling reading and editing Word files to populate invoice templates
-- `docx2pdf`: for converting the generated Word files into PDF files for final delivery
+- [`personal_utils.docx_manipulate`](https://github.com/leopengningchuan/personal_utils): for modifying Word files
 
 ### 2. Invoice Template Word and Invoice Info Excel
 This project uses two key supporting files to generate customized invoices:
