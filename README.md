@@ -12,7 +12,7 @@ This project aims to automate the generation of company invoices in PDF by using
 ## Table of Contents
 - README.md
 - LICENSE.txt
-- [utils](https://github.com/leopengningchuan/personal_utils)(submodel)
+- [utils](https://github.com/leopengningchuan/personal_utils) (submodel)
 - invoice_automation.ipynb
 - inv_info_sample.xlsx
 - inv_template.docx
