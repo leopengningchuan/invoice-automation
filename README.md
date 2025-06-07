@@ -7,10 +7,10 @@ Mass invoice generation and automation tool
 - [File Structure](#file-structure)
 - [Instructions](#instructions)
   - [1. Packages Used](#1-packages-used)
-  - [2. Prepare Invoice Template and Info](#2-prepare-invoice-template-and-info)
+  - [2. Invoice Template Word and Invoice Info Excel](#2-invoice-template-word-and-invoice-info-excel)
   - [3. Build Invoice Data Dictionary](#3-build-invoice-data-dictionary)
-  - [4. Generate Word Invoices from Placeholders](#4-generate-word-invoices-from-placeholders)
-  - [5. Convert Word Files to PDF](#5-convert-word-files-to-pdf)
+  - [4. Word Invoice Generation with Placeholder Replacement](#4-word-invoice-generation-with-placeholder-replacement)
+  - [5. Convert Word Files to PDF Files](#5-convert-word-files-to-pdf-files)
 - [Future Improvements](#future-improvements)
 - [License](#license)
 
