@@ -1,6 +1,19 @@
 # Invoice Automation
 Mass invoice generation and automation tool
 
+## Table of Contents
+- [Project Background](#project-background)
+- [Project Goal](#project-goal)
+- [File Structure](#file-structure)
+- [Instructions](#instructions)
+  - [1. Packages Used](#1-packages-used)
+  - [2. Prepare Invoice Template and Info](#2-prepare-invoice-template-and-info)
+  - [3. Build Invoice Data Dictionary](#3-build-invoice-data-dictionary)
+  - [4. Generate Word Invoices from Placeholders](#4-generate-word-invoices-from-placeholders)
+  - [5. Convert Word Files to PDF](#5-convert-word-files-to-pdf)
+- [Future Improvements](#future-improvements)
+- [License](#license)
+
 ## Project Background
 In many businesses, invoice generation is a critical but often time-consuming task, especially when handling a large volume of customer transactions. Manual processing not only increases the risk of errors but also leads to significant inefficiencies in operations.
 
@@ -9,18 +22,21 @@ To address these challenges, this project was developed to automate the invoice 
 ## Project Goal
 This project aims to automate the generation of company invoices in PDF by using **Python Jupyter Notebook**, **Microsoft Excel** and **Microsoft Word**. It is designed to process large-scale customer sales data efficiently, ensuring accurate, consistent, and scalable invoice creation with minimal manual intervention.
 
-## Table of Contents
-- README.md
-- LICENSE.txt
-- [utils](https://github.com/leopengningchuan/personal_utils) (submodel)
-- invoice_automation.ipynb
-- inv_info_sample.xlsx
-- inv_template.docx
-- SAMCO_1–4.pdf (sample invoices generated)
+## File Structure
+- `README.md`
+- `LICENSE.txt`
+- `.gitignore`
+- `.gitattributes`
+- `.gitmodules`
+- [`utils/`](https://github.com/leopengningchuan/personal_utils) – submodule used
+- `invoice_automation.ipynb`
+- `inv_info_sample.xlsx`
+- `inv_template.docx`
+- `SAMCO_1–4.pdf` – sample invoices generated
 
 ## Instructions
 
-### 1. Package Used
+### 1. Packages Used
 - `pandas, datetime, re`: for data manipulation
 - [`personal_utils.docx_manipulate`](https://github.com/leopengningchuan/personal_utils): for modifying Word files
 
