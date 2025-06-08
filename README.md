@@ -23,16 +23,16 @@ To address these challenges, this project was developed to automate the invoice 
 This project aims to automate the generation of company invoices in PDF by using **Python Jupyter Notebook**, **Microsoft Excel** and **Microsoft Word**. It is designed to process large-scale customer sales data efficiently, ensuring accurate, consistent, and scalable invoice creation with minimal manual intervention.
 
 ## File Structure
-- `README.md`
-- `LICENSE.txt`
-- `.gitignore`
-- `.gitattributes`
-- `.gitmodules`
+- `README.md` – project overview
+- `LICENSE.txt` – license information
+- `.gitignore` – git ignore config
+- `.gitattributes` – git attributes config
+- `.gitmodules` – git submodules config
 - [`utils/`](https://github.com/leopengningchuan/personal_utils) – submodule used
-- `invoice_automation.ipynb`
-- `inv_info_sample.xlsx`
-- `inv_template.docx`
-- `SAMCO_1–4.pdf` – sample invoices generated
+- `invoice_automation.ipynb` – notebook for invoice generation  
+- `inv_info_sample.xlsx`– sample invoice input data  
+- `inv_template.docx` – word invoice template
+- `SAMCO_1–4.pdf` – sample output
 
 ## Instructions
 
