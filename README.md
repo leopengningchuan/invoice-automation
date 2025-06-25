@@ -7,10 +7,10 @@ Mass invoice generation and automation tool
 - [File Structure](#file-structure)
 - [Instructions](#instructions)
   - [1. Packages Used](#1-packages-used)
-  - [2. Invoice Template Word and Invoice Info Excel](#2-invoice-template-word-and-invoice-info-excel)
+  - [2. Invoice Template DOCX and Invoice Info XLSX](#2-invoice-template-docx-and-invoice-info-xlsx)
   - [3. Build Invoice Data Dictionary](#3-build-invoice-data-dictionary)
-  - [4. Word Invoice Generation with Placeholder Replacement](#4-word-invoice-generation-with-placeholder-replacement)
-  - [5. Convert Word Files to PDF Files](#5-convert-word-files-to-pdf-files)
+  - [4. DOCX Invoice Generation with Placeholder Replacement](#4-docx-invoice-generation-with-placeholder-replacement)
+  - [5. Convert DOCX Files to PDF Files](#5-convert-docx-files-to-pdf-files)
 - [Future Improvements](#future-improvements)
 - [License](#license)
 
@@ -30,24 +30,24 @@ This project aims to automate the generation of company invoices in PDF by using
 - `.gitmodules` – git submodules config
 - [`utils/`](https://github.com/leopengningchuan/personal_utils) – submodule used
 - `invoice_automation.ipynb` – notebook for invoice generation  
-- `inv_info_sample.xlsx`– sample invoice input data  
-- `inv_template.docx` – word invoice template
-- `SAMCO_1–4.pdf` – sample output
+- `inv_info_sample.xlsx`– sample invoice input data XLSX
+- `inv_template.docx` – invoice template DOCX
+- `SAMCO_1–4.pdf` – sample output PDF
 
 ## Instructions
 
 ### 1. Packages Used
-- `pandas, datetime, re`: for data manipulation
-- [`personal_utils.docx_manipulate`](https://github.com/leopengningchuan/personal_utils): for modifying Word files
+- `pandas`, `datetime`, `re`: for data manipulation
+- [`personal_utils.docx_manipulate`](https://github.com/leopengningchuan/personal_utils): for modifying DOCX files and coverting PDF files
 
-### 2. Invoice Template Word and Invoice Info Excel
+### 2. Invoice Template DOCX and Invoice Info XLSX
 This project uses two key supporting files to generate customized invoices:
 - `inv_template.docx`
-This is the base Word template used for invoice generation. It contains placeholders (e.g., `CUSTOMER`, `DOC_DATE`, `AMOUNT1`, `TOTAL_AMOUNT`, etc.) that will be replaced with actual data from the Excel sheet.
-The visual layout of the invoice—such as the company logo, table formatting, and footer—is pre-defined in this file. For the company issuing the invoice, information like the company name, address, and banking details can be edited directly within the Word file.
+This is the base DOCX template used for invoice generation. It contains placeholders (e.g., `CUSTOMER`, `DOC_DATE`, `AMOUNT1`, `TOTAL_AMOUNT`, etc.) that will be replaced with actual data from the XLSX sheet.
+The visual layout of the invoice—such as the company logo, table formatting, and footer—is pre-defined in this file. For the company issuing the invoice, information like the company name, address, and banking details can be edited directly within the DOCX file.
 
 - `inv_info.xlsx`
-This is the base Excel file contains structured invoice data. Each row represents one invoice, with columns corresponding to invoice fields:
+This is the base XLSX file contains structured invoice data. Each row represents one invoice, with columns corresponding to invoice fields:
 
 | Invoice No. |  Customer  | Customer Address1 |    Customer Address2   | Invoice Date | Payment Terms |    Item   |       Detail      |               Unit Price               | Quantity |
 |:-----------:|:----------:|:-----------------:|:----------------------:|:------------:|:-------------:|:---------:|:-----------------:|:--------------------------------------:|:--------:|
@@ -57,17 +57,17 @@ This is the base Excel file contains structured invoice data. Each row represent
 The program reads this data row by row and fills the template accordingly to generate one PDF file per invoice.
 
 ### 3. Build Invoice Data Dictionary
-The program processes each row from the Excel file and converts it into a structured Python dictionary. Each key in the dictionary corresponds to a placeholder in the Word template (e.g., `CUSTOMER`, `DOC_DATE`, `AMOUNT1`, `TOTAL_AMOUNT`, etc.). This step ensures the data is clean, properly formatted (e.g., currency, dates), and ready for insertion into the template.
+The program processes each row from the XLSX file and converts it into a structured Python dictionary. Each key in the dictionary corresponds to a placeholder in the DOCX template (e.g., `CUSTOMER`, `DOC_DATE`, `AMOUNT1`, `TOTAL_AMOUNT`, etc.). This step ensures the data is clean, properly formatted (e.g., currency, dates), and ready for insertion into the template.
 
-### 4. Word Invoice Generation with Placeholder Replacement
-The invoice automation process uses `populate_docx_table()` from the `utils.docx_manipulate` module to dynamically replace placeholders in a Word docx template using values from an invoice dictionary.
+### 4. DOCX Invoice Generation with Placeholder Replacement
+The invoice automation process uses `populate_docx_table()` from the `utils.docx_manipulate` module to dynamically replace placeholders in a DOCX template using values from an invoice dictionary.
 
-For each invoice entry, the script fills in matching placeholders within table cells and generates a Word invoice. The output preserves the formatting and structure defined in the original template, which remains unchanged to ensure consistent formatting across all invoices.
+For each invoice entry, the script fills in matching placeholders within table cells and generates a DOCX invoice. The output preserves the formatting and structure defined in the original template, which remains unchanged to ensure consistent formatting across all invoices.
 
 The `utils/` folder is included as a Git submodule and contains a reusable function library maintained in the [`personal_utils`](https://github.com/leopengningchuan/personal_utils). You can refer to that repository for detailed function documentation and personal notes.
 
-### 5. Convert Word Files to PDF Files
-After each invoice is generated as a Word file, it is immediately converted into a PDF file for final output. To keep the workspace clean and prevent duplication, the intermediate Word file is automatically deleted after the PDF is successfully created.
+### 5. Convert DOCX Files to PDF Files
+After each invoice is generated as a DOCX file, it is immediately converted into a PDF file for final output. To keep the workspace clean and prevent duplication, the intermediate DOCX file is automatically deleted after the PDF is successfully created.
 
 ## Future Improvements
 - **Duplicate Invoice Detection**: Add a check to flag or prevent generation of duplicate invoices based on invoice number or client name.
