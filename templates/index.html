@@ -63,6 +63,9 @@
 
         .form-group {
             margin-bottom: 15px;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px dashed #e9ecef;
         }
 
         .form-group label {
@@ -100,6 +103,7 @@
             transition: all 0.3s ease;
             cursor: pointer;
             position: relative;
+            z-index: 0;
         }
 
         .upload-area:hover {
@@ -113,6 +117,16 @@
             transform: scale(1.02);
         }
 
+        .upload-area.processing {
+            opacity: 0.6;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
+        .upload-area.processing .upload-text {
+            color: #999;
+        }
+
         .upload-icon {
             font-size: 4em;
             color: #667eea;
@@ -123,11 +137,13 @@
             font-size: 1.2em;
             color: #333;
             margin-bottom: 10px;
+            text-align: center;
         }
 
         .upload-subtext {
             color: #666;
             font-size: 0.9em;
+            text-align: center;
         }
 
         .file-input {
@@ -138,6 +154,7 @@
             height: 100%;
             opacity: 0;
             cursor: pointer;
+            z-index: 1;
         }
 
         .btn {
@@ -262,28 +279,31 @@
         }
 
         .requirements {
-            margin-top: 30px;
-            padding: 20px;
+            margin-top: 20px;
+            padding: 15px;
             background-color: #f8f9fa;
             border-radius: 10px;
             text-align: left;
         }
 
-        .requirements h3 {
+        .requirements h4 {
             color: #333;
-            margin-bottom: 15px;
+            margin-bottom: 10px;
+            font-size: 1em;
         }
 
         .requirements ul {
             list-style: none;
             padding-left: 0;
+            margin: 0;
         }
 
         .requirements li {
-            padding: 5px 0;
+            padding: 3px 0;
             color: #666;
             position: relative;
-            padding-left: 20px;
+            padding-left: 18px;
+            font-size: 0.9em;
         }
 
         .requirements li:before {
@@ -300,6 +320,144 @@
             font-weight: bold;
             margin: 10px 0;
         }
+
+        .template-downloads {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px dashed #e9ecef;
+        }
+
+        .template-downloads h4 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+        }
+
+        .template-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 10px;
+        }
+
+        .btn-template {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            flex: 1;
+            min-width: 180px;
+        }
+
+        .btn-template:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 15px rgba(40, 167, 69, 0.3);
+        }
+
+        .btn-template:active {
+            transform: translateY(0);
+        }
+
+        .template-upload {
+            margin-bottom: 20px;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px dashed #e9ecef;
+        }
+
+        .template-upload h4 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .template-upload-area {
+            border: 3px dashed #ddd;
+            border-radius: 15px;
+            padding: 40px 20px;
+            margin: 20px 0;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            z-index: 0;
+        }
+
+        .template-upload-area:hover {
+            border-color: #667eea;
+            background-color: #f8f9ff;
+        }
+
+        .template-upload-area.dragover {
+            border-color: #667eea;
+            background-color: #f0f4ff;
+            transform: scale(1.02);
+        }
+
+        .template-upload-area.processing {
+            opacity: 0.6;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
+        .template-upload-area.processing .upload-text {
+            color: #999;
+        }
+
+        .template-upload-icon {
+            font-size: 4em;
+            color: #667eea;
+            margin-bottom: 20px;
+        }
+
+        .template-upload-text {
+            font-size: 1.2em;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .template-upload-subtext {
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .template-upload-file-input {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+            z-index: 1;
+        }
+
+        .template-status {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 10px;
+            background-color: #f8f9fa;
+        }
+
+        .status-info {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .status-icon {
+            margin-right: 10px;
+        }
+
+        .status-text {
+            font-size: 1.1em;
+            color: #666;
+        }
     </style>
 </head>
 <body>
@@ -311,6 +469,31 @@
 
         <div class="settings-section">
             <h3>生成设置</h3>
+            <div class="template-downloads">
+                <h4>Download Templates</h4>
+                <div class="template-buttons">
+                    <button class="btn btn-template" onclick="downloadTemplate('format')">
+                        Download Invoice Format Template
+                    </button>
+                    <button class="btn btn-template" onclick="downloadTemplate('info')">
+                        Download Invoice Info Template
+                    </button>
+                </div>
+            </div>
+            <div class="template-upload">
+                <h4>Upload Custom Template</h4>
+                <div class="template-upload-area" id="templateUploadArea">
+                    <div class="upload-text">Select your custom invoice template</div>
+                    <div class="upload-subtext">Supporting .docx file only</div>
+                    <input type="file" id="templateInput" class="file-input" accept=".docx">
+                </div>
+                <div class="template-status" id="templateStatus">
+                    <div class="status-info">
+                        <span class="status-icon">ℹ️</span>
+                        <span class="status-text">Using default template</span>
+                    </div>
+                </div>
+            </div>
             <div class="form-group">
                 <label for="salesTaxRate">销售税率 (%)</label>
                 <input type="number" id="salesTaxRate" name="salesTaxRate" value="10" min="0" max="100" step="0.1">
@@ -319,10 +502,17 @@
         </div>
 
         <div class="upload-area" id="uploadArea">
-            <div class="upload-icon">📄</div>
-            <div class="upload-text">Click to select or drag and drop your Excel file here</div>
+            <div class="upload-text">Select your Excel file here</div>
             <div class="upload-subtext">Supporting .xlsx and .xls file</div>
             <input type="file" id="fileInput" class="file-input" accept=".xlsx,.xls">
+            <div class="requirements">
+                <h4>Excel File Requirements</h4>
+                <ul>
+                    <li>Please ensure that all required fields in the Excel file are completed</li>
+                    <li>Each invoice number may include multiple line items</li>
+                    <li>Subtotals, tax, and the final amount will be automatically calculated</li>
+                </ul>
+            </div>
         </div>
 
         <div class="progress-container" id="progressContainer">
@@ -344,15 +534,6 @@
             <h3>生成完成！</h3>
             <button class="btn" id="downloadBtn">Download Invoices (ZIP)</button>
         </div>
-
-        <div class="requirements">
-            <h3>Excel File Requirements</h3>
-            <ul>
-                <li>Please ensure that all required fields in the Excel file are completed</li>
-                <li>Each invoice number may include multiple line items</li>
-                <li>Subtotals, tax, and the final amount will be automatically calculated</li>
-            </ul>
-        </div>
     </div>
 
     <script>
@@ -368,10 +549,17 @@
         const fileList = document.getElementById('fileList');
         const downloadSection = document.getElementById('downloadSection');
         const downloadBtn = document.getElementById('downloadBtn');
+        
+        // 模板上传相关元素
+        const templateUploadArea = document.getElementById('templateUploadArea');
+        const templateInput = document.getElementById('templateInput');
+        const templateStatus = document.getElementById('templateStatus');
 
         let currentDownloadUrl = '';
         let startTime = null;
         let timerInterval = null;
+        let isProcessing = false; // 防止重复处理
+        let isTemplateProcessing = false; // 防止模板重复处理
 
         // 拖拽上传功能
         uploadArea.addEventListener('dragover', (e) => {
@@ -387,18 +575,63 @@
             e.preventDefault();
             uploadArea.classList.remove('dragover');
             const files = e.dataTransfer.files;
-            if (files.length > 0) {
+            if (files.length > 0 && !isProcessing) {
                 handleFile(files[0]);
             }
         });
 
-        uploadArea.addEventListener('click', () => {
-            fileInput.click();
+        uploadArea.addEventListener('click', (e) => {
+            // 防止重复点击
+            if (isProcessing) return;
+            
+            // 确保点击的是上传区域本身，而不是文件输入框
+            if (e.target === uploadArea || e.target.closest('.upload-icon') || 
+                e.target.closest('.upload-text') || e.target.closest('.upload-subtext')) {
+                fileInput.click();
+            }
         });
 
         fileInput.addEventListener('change', (e) => {
-            if (e.target.files.length > 0) {
-                handleFile(e.target.files[0]);
+            if (e.target.files.length > 0 && !isProcessing) {
+                const file = e.target.files[0];
+                handleFile(file);
+            }
+        });
+
+        // 模板上传功能
+        templateUploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            templateUploadArea.classList.add('dragover');
+        });
+
+        templateUploadArea.addEventListener('dragleave', () => {
+            templateUploadArea.classList.remove('dragover');
+        });
+
+        templateUploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            templateUploadArea.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            if (files.length > 0 && !isTemplateProcessing) {
+                handleTemplateFile(files[0]);
+            }
+        });
+
+        templateUploadArea.addEventListener('click', (e) => {
+            // 防止重复点击
+            if (isTemplateProcessing) return;
+            
+            // 确保点击的是上传区域本身，而不是文件输入框
+            if (e.target === templateUploadArea || e.target.closest('.upload-icon') || 
+                e.target.closest('.upload-text') || e.target.closest('.upload-subtext')) {
+                templateInput.click();
+            }
+        });
+
+        templateInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0 && !isTemplateProcessing) {
+                const file = e.target.files[0];
+                handleTemplateFile(file);
             }
         });
 
@@ -424,6 +657,9 @@
         }
 
         function handleFile(file) {
+            // 防止重复处理
+            if (isProcessing) return;
+            
             // 检查文件类型
             if (!file.name.match(/\.(xlsx|xls)$/i)) {
                 showStatus('请选择Excel文件 (.xlsx 或 .xls)', 'error');
@@ -436,6 +672,12 @@
                 showStatus('请输入有效的销售税率 (0-100%)', 'error');
                 return;
             }
+
+            // 设置处理状态
+            isProcessing = true;
+            
+            // 添加上传区域的视觉反馈
+            uploadArea.classList.add('processing');
 
             // 显示文件信息
             showFileInfo(file, taxRate);
@@ -486,7 +728,9 @@
                 method: 'POST',
                 body: formData
             })
-            .then(response => response.json())
+            .then(response => {
+                return response.json();
+            })
             .then(data => {
                 clearInterval(progressInterval);
                 progressFill.style.width = '100%';
@@ -508,6 +752,15 @@
                 showStatus('上传失败：' + error.message, 'error');
             })
             .finally(() => {
+                // 重置处理状态
+                isProcessing = false;
+                
+                // 移除上传区域的视觉反馈
+                uploadArea.classList.remove('processing');
+                
+                // 清空文件输入框，允许重新选择相同文件
+                fileInput.value = '';
+                
                 setTimeout(() => {
                     progressContainer.style.display = 'none';
                 }, 3000);
@@ -530,10 +783,20 @@
             
             // 更新文件列表
             if (data.generated_files && data.generated_files.length > 0) {
-                fileList.innerHTML += '<li><strong>生成的发票：</strong></li>';
+                fileList.innerHTML += '<li><strong>生成的文件：</strong></li>';
                 data.generated_files.forEach(file => {
-                    fileList.innerHTML += `<li>• ${file}</li>`;
+                    const fileType = file.endsWith('.pdf') ? '📄 PDF' : '📝 DOCX';
+                    fileList.innerHTML += `<li>• ${file} (${fileType})</li>`;
                 });
+                
+                // 显示文件类型说明
+                if (data.file_types && data.file_types.length > 0) {
+                    const typeText = data.file_types.includes('DOCX') ? 
+                        '注意：由于系统权限限制，部分文件以DOCX格式提供。您可以使用Word或其他文档编辑器打开。' : '';
+                    if (typeText) {
+                        fileList.innerHTML += `<li style="color: #856404; font-style: italic;">${typeText}</li>`;
+                    }
+                }
             }
         }
 
@@ -548,13 +811,126 @@
             fetch('/health')
                 .then(response => response.json())
                 .then(data => {
-                    console.log('服务状态：', data.message);
+                    // 服务正常，无需显示任何信息
                 })
                 .catch(error => {
-                    console.error('服务连接失败：', error);
                     showStatus('无法连接到服务器，请确保后端服务正在运行', 'error');
                 });
+            
+            // 检查模板状态
+            checkTemplateStatus();
         });
+
+        // 检查模板状态
+        function checkTemplateStatus() {
+            fetch('/template/status')
+                .then(response => response.json())
+                .then(data => {
+                    updateTemplateStatus(data);
+                })
+                .catch(error => {
+                    console.error('检查模板状态失败:', error);
+                });
+        }
+
+        // 更新模板状态显示
+        function updateTemplateStatus(data) {
+            const statusInfo = templateStatus.querySelector('.status-info');
+            if (data.has_custom_template) {
+                statusInfo.innerHTML = `
+                    <span class="status-text">Custom template uploaded</span>
+                `;
+                templateStatus.style.backgroundColor = '#d4edda';
+                templateStatus.style.border = '1px solid #c3e6cb';
+            } else {
+                statusInfo.innerHTML = `
+                    <span class="status-text">Using default template</span>
+                `;
+                templateStatus.style.backgroundColor = '#f8f9fa';
+                templateStatus.style.border = '1px solid #e9ecef';
+            }
+        }
+
+        // 处理模板文件上传
+        function handleTemplateFile(file) {
+            // 防止重复处理
+            if (isTemplateProcessing) return;
+            
+            // 检查文件类型
+            if (!file.name.match(/\.docx$/i)) {
+                showStatus('请选择Word文档文件 (.docx)', 'error');
+                return;
+            }
+
+            // 设置处理状态
+            isTemplateProcessing = true;
+            
+            // 添加上传区域的视觉反馈
+            templateUploadArea.classList.add('processing');
+
+            // 上传模板文件
+            uploadTemplateFile(file);
+        }
+
+        // 上传模板文件
+        function uploadTemplateFile(file) {
+            const formData = new FormData();
+            formData.append('template', file);
+
+            showStatus('正在上传模板文件...', 'info');
+
+            fetch('/upload/template', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => {
+                return response.json();
+            })
+            .then(data => {
+                if (data.error) {
+                    showStatus(data.error, 'error');
+                } else {
+                    showStatus(data.message, 'success');
+                    // 更新模板状态
+                    checkTemplateStatus();
+                }
+            })
+            .catch(error => {
+                showStatus('上传模板失败：' + error.message, 'error');
+            })
+            .finally(() => {
+                // 重置处理状态
+                isTemplateProcessing = false;
+                
+                // 移除上传区域的视觉反馈
+                templateUploadArea.classList.remove('processing');
+                
+                // 清空文件输入框
+                templateInput.value = '';
+            });
+        }
+
+        // 模板下载函数
+        function downloadTemplate(type) {
+            const url = type === 'format' ? '/download/template/format' : '/download/template/info';
+            const filename = type === 'format' ? 'invoice_format_template.docx' : 'invoice_info_template.xlsx';
+            
+            // 显示下载状态
+            showStatus(`正在下载${type === 'format' ? '发票格式模板' : '发票信息模板'}...`, 'info');
+            
+            // 创建下载链接
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = filename;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            // 显示成功消息
+            setTimeout(() => {
+                showStatus(`${type === 'format' ? '发票格式模板' : '发票信息模板'}下载完成！`, 'success');
+            }, 1000);
+        }
     </script>
 </body>
 </html> 
