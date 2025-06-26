@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoice Automation System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .header {
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: #333;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 1.1em;
+        }
+
+        .settings-section {
+            background-color: #f8f9fa;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: left;
+        }
+
+        .settings-section h3 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.2em;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+            font-weight: 500;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 10px 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .form-group .help-text {
+            font-size: 0.9em;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .upload-area {
+            border: 3px dashed #ddd;
+            border-radius: 15px;
+            padding: 40px 20px;
+            margin: 30px 0;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .upload-area:hover {
+            border-color: #667eea;
+            background-color: #f8f9ff;
+        }
+
+        .upload-area.dragover {
+            border-color: #667eea;
+            background-color: #f0f4ff;
+            transform: scale(1.02);
+        }
+
+        .upload-icon {
+            font-size: 4em;
+            color: #667eea;
+            margin-bottom: 20px;
+        }
+
+        .upload-text {
+            font-size: 1.2em;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .upload-subtext {
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .file-input {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 10px;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .progress-container {
+            margin: 20px 0;
+            display: none;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background-color: #f0f0f0;
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .status {
+            margin: 20px 0;
+            padding: 15px;
+            border-radius: 10px;
+            display: none;
+        }
+
+        .status.success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .status.error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .status.info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        .file-info {
+            margin: 20px 0;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            display: none;
+        }
+
+        .file-info h3 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .file-list {
+            list-style: none;
+            text-align: left;
+        }
+
+        .file-list li {
+            padding: 5px 0;
+            color: #666;
+        }
+
+        .download-section {
+            margin-top: 30px;
+            display: none;
+        }
+
+        .download-section h3 {
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .requirements {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            text-align: left;
+        }
+
+        .requirements h3 {
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .requirements ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .requirements li {
+            padding: 5px 0;
+            color: #666;
+            position: relative;
+            padding-left: 20px;
+        }
+
+        .requirements li:before {
+            content: "✓";
+            color: #28a745;
+            font-weight: bold;
+            position: absolute;
+            left: 0;
+        }
+
+        .timer {
+            font-size: 1.1em;
+            color: #667eea;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Invoice Automation System</h1>
+            <p>Upload Excel file, automatically generate invoice PDF</p>
+        </div>
+
+        <div class="settings-section">
+            <h3>生成设置</h3>
+            <div class="form-group">
+                <label for="salesTaxRate">销售税率 (%)</label>
+                <input type="number" id="salesTaxRate" name="salesTaxRate" value="10" min="0" max="100" step="0.1">
+                <div class="help-text">输入销售税率百分比，例如：10 表示 10%</div>
+            </div>
+        </div>
+
+        <div class="upload-area" id="uploadArea">
+            <div class="upload-icon">📄</div>
+            <div class="upload-text">Click to select or drag and drop your Excel file here</div>
+            <div class="upload-subtext">Supporting .xlsx and .xls file</div>
+            <input type="file" id="fileInput" class="file-input" accept=".xlsx,.xls">
+        </div>
+
+        <div class="progress-container" id="progressContainer">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div id="progressText">Processing...</div>
+            <div class="timer" id="timer">00:00</div>
+        </div>
+
+        <div class="status" id="status"></div>
+
+        <div class="file-info" id="fileInfo">
+            <h3>File Information</h3>
+            <ul class="file-list" id="fileList"></ul>
+        </div>
+
+        <div class="download-section" id="downloadSection">
+            <h3>生成完成！</h3>
+            <button class="btn" id="downloadBtn">Download Invoices (ZIP)</button>
+        </div>
+
+        <div class="requirements">
+            <h3>Excel File Requirements</h3>
+            <ul>
+                <li>Please ensure that all required fields in the Excel file are completed</li>
+                <li>Each invoice number may include multiple line items</li>
+                <li>Subtotals, tax, and the final amount will be automatically calculated</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+        const salesTaxRateInput = document.getElementById('salesTaxRate');
+        const progressContainer = document.getElementById('progressContainer');
+        const progressFill = document.getElementById('progressFill');
+        const progressText = document.getElementById('progressText');
+        const timer = document.getElementById('timer');
+        const status = document.getElementById('status');
+        const fileInfo = document.getElementById('fileInfo');
+        const fileList = document.getElementById('fileList');
+        const downloadSection = document.getElementById('downloadSection');
+        const downloadBtn = document.getElementById('downloadBtn');
+
+        let currentDownloadUrl = '';
+        let startTime = null;
+        let timerInterval = null;
+
+        // 拖拽上传功能
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragover');
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                handleFile(files[0]);
+            }
+        });
+
+        uploadArea.addEventListener('click', () => {
+            fileInput.click();
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                handleFile(e.target.files[0]);
+            }
+        });
+
+        function startTimer() {
+            startTime = Date.now();
+            timerInterval = setInterval(updateTimer, 1000);
+        }
+
+        function stopTimer() {
+            if (timerInterval) {
+                clearInterval(timerInterval);
+                timerInterval = null;
+            }
+        }
+
+        function updateTimer() {
+            if (startTime) {
+                const elapsed = Math.floor((Date.now() - startTime) / 1000);
+                const minutes = Math.floor(elapsed / 60);
+                const seconds = elapsed % 60;
+                timer.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            }
+        }
+
+        function handleFile(file) {
+            // 检查文件类型
+            if (!file.name.match(/\.(xlsx|xls)$/i)) {
+                showStatus('请选择Excel文件 (.xlsx 或 .xls)', 'error');
+                return;
+            }
+
+            // 验证税率输入
+            const taxRate = parseFloat(salesTaxRateInput.value);
+            if (isNaN(taxRate) || taxRate < 0 || taxRate > 100) {
+                showStatus('请输入有效的销售税率 (0-100%)', 'error');
+                return;
+            }
+
+            // 显示文件信息
+            showFileInfo(file, taxRate);
+            
+            // 上传文件
+            uploadFile(file, taxRate);
+        }
+
+        function showFileInfo(file, taxRate) {
+            fileInfo.style.display = 'block';
+            fileList.innerHTML = `
+                <li><strong>文件名：</strong>${file.name}</li>
+                <li><strong>文件大小：</strong>${formatFileSize(file.size)}</li>
+                <li><strong>文件类型：</strong>${file.type || 'Excel文件'}</li>
+                <li><strong>销售税率：</strong>${taxRate}%</li>
+            `;
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        function uploadFile(file, taxRate) {
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('sales_tax_rate', taxRate / 100); // 转换为小数
+
+            // 显示进度条和开始计时
+            progressContainer.style.display = 'block';
+            progressFill.style.width = '0%';
+            progressText.innerHTML = '<span class="loading"></span>正在上传文件...';
+            hideStatus();
+            startTimer();
+
+            // 模拟上传进度
+            let progress = 0;
+            const progressInterval = setInterval(() => {
+                progress += Math.random() * 30;
+                if (progress > 90) progress = 90;
+                progressFill.style.width = progress + '%';
+            }, 200);
+
+            fetch('/upload', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                clearInterval(progressInterval);
+                progressFill.style.width = '100%';
+                progressText.textContent = '处理完成！';
+                stopTimer();
+
+                if (data.error) {
+                    showStatus(data.error, 'error');
+                } else {
+                    // 显示处理时间
+                    const processingTime = data.processing_time || timer.textContent;
+                    showStatus(`${data.message} (处理时间: ${processingTime})`, 'success');
+                    showDownloadSection(data);
+                }
+            })
+            .catch(error => {
+                clearInterval(progressInterval);
+                stopTimer();
+                showStatus('上传失败：' + error.message, 'error');
+            })
+            .finally(() => {
+                setTimeout(() => {
+                    progressContainer.style.display = 'none';
+                }, 3000);
+            });
+        }
+
+        function showStatus(message, type) {
+            status.textContent = message;
+            status.className = `status ${type}`;
+            status.style.display = 'block';
+        }
+
+        function hideStatus() {
+            status.style.display = 'none';
+        }
+
+        function showDownloadSection(data) {
+            downloadSection.style.display = 'block';
+            currentDownloadUrl = data.download_url;
+            
+            // 更新文件列表
+            if (data.generated_files && data.generated_files.length > 0) {
+                fileList.innerHTML += '<li><strong>生成的发票：</strong></li>';
+                data.generated_files.forEach(file => {
+                    fileList.innerHTML += `<li>• ${file}</li>`;
+                });
+            }
+        }
+
+        downloadBtn.addEventListener('click', () => {
+            if (currentDownloadUrl) {
+                window.location.href = currentDownloadUrl;
+            }
+        });
+
+        // 页面加载时检查服务状态
+        window.addEventListener('load', () => {
+            fetch('/health')
+                .then(response => response.json())
+                .then(data => {
+                    console.log('服务状态：', data.message);
+                })
+                .catch(error => {
+                    console.error('服务连接失败：', error);
+                    showStatus('无法连接到服务器，请确保后端服务正在运行', 'error');
+                });
+        });
+    </script>
+</body>
+</html> 
