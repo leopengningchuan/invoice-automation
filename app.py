@@ -7,6 +7,7 @@ from flask import Flask, request, jsonify, send_file, render_template
 from flask_cors import CORS
 from werkzeug.utils import secure_filename
 
+from invoice_info import get_inv_info
 from utils.docx_manipulate import populate_docx_table, convert_docx_pdf
 
 warnings.filterwarnings('ignore')
@@ -36,60 +37,6 @@ def allowed_file(filename):
 
 def allowed_template_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_TEMPLATE_EXTENSIONS
-
-def get_inv_info(inv_info, inv_no, sales_tax_rate=0.1):
-    """获取发票信息的函数"""
-    # 使用特定发票的信息
-    use_info = inv_info[inv_info['Invoice No.'] == inv_no].reset_index(drop=True)
-    item_dict = {}
-    
-    # 发票信息
-    item_dict['CUSTOMER'] = use_info['Customer'].unique()[0]
-    item_dict['CUSTOMER_ADDRESS1'] = use_info['Customer Address1'].unique()[0]
-    item_dict['CUSTOMER_ADDRESS2'] = use_info['Customer Address2'].unique()[0]
-    item_dict['INV_NO'] = use_info['Invoice No.'].unique()[0]
-    item_dict['PAYMENT_TERMS'] = use_info['Payment Terms'].unique()[0]
-    item_dict['DOC_DATE'] = str(pd.to_datetime(use_info['Invoice Date'].unique()[0]).date())
-    item_dict['DUE_DATE'] = str(pd.to_datetime(use_info['Invoice Date'].unique()[0]).date() + pd.Timedelta(days=inv_info['Payment Terms'].unique()[0]))
-    item_dict['SUB_AMOUNT'] = 0
-    
-    # 产品信息，最多15个项目
-    for i in range(1, 16):
-        try:
-            # 对于非空项目，获取信息
-            item_dict['ITEM' + str(i)] = use_info.loc[i-1, 'Item']
-            item_dict['DETAIL' + str(i)] = use_info.loc[i-1, 'Detail']
-            item_dict['UNITPRICE' + str(i)] = use_info.loc[i-1, 'Unit Price']
-            item_dict['QUAN' + str(i)] = use_info.loc[i-1, 'Quantity']
-            item_dict['AMT' + str(i)] = use_info.loc[i-1, 'Unit Price'] * use_info.loc[i-1, 'Quantity']
-            
-            # 获取小计总和
-            item_dict['SUB_AMOUNT'] += item_dict['AMT' + str(i)]
-            
-        except:
-            # 对于空项目，输入空信息
-            item_dict['ITEM' + str(i)] = ""
-            item_dict['DETAIL' + str(i)] = ""
-            item_dict['UNITPRICE' + str(i)] = ""
-            item_dict['QUAN' + str(i)] = ""
-            item_dict['AMT' + str(i)] = ""
-    
-    # 获取税额和总金额
-    item_dict['TAX_AMOUNT'] = round(item_dict['SUB_AMOUNT'] * sales_tax_rate, 2)
-    item_dict['TOTAL_AMOUNT'] = item_dict['SUB_AMOUNT'] + item_dict['TAX_AMOUNT']
-    
-    # 将所有单价、金额转换为000,000.00格式
-    for k in item_dict.keys():
-        if any(x in k for x in ('UNITPRICE', 'AMT', 'AMOUNT', 'QUAN', 'PAYMENT_TERMS')):
-            try:
-                if any(x in k for x in ('UNITPRICE', 'AMT', 'AMOUNT')):
-                    item_dict[k] = '{0:,.2f}'.format(item_dict[k])
-                else: 
-                    item_dict[k] = '{0:,}'.format(item_dict[k])
-            except:
-                pass
-            
-    return item_dict
 
 @app.route('/')
 def index():
