@@ -141,7 +141,7 @@ def upload_file():
                 if os.path.exists(custom_template_path):
                     template_file = custom_template_path
                 else:
-                    template_file = 'inv_template.docx'
+                    template_file = 'assets/template_invoice_format.docx'
                 
                 # 替换Word模板中的发票信息
                 populate_docx_table(item_dict, template_file, docx_path)
@@ -256,7 +256,7 @@ def template_status():
         else:
             return jsonify({
                 'has_custom_template': False,
-                'template_name': 'inv_template.docx (默认模板)'
+                'template_name': 'template_invoice_format.docx (默认模板)'
             })
     except Exception as e:
         return jsonify({'error': f'检查模板状态时出错: {str(e)}'}), 500

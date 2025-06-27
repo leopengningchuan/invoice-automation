@@ -48,39 +48,48 @@
         }
 
         .settings-section {
-            background-color: #f8f9fa;
-            border-radius: 15px;
+            background: white;
             padding: 20px;
-            margin: 20px 0;
-            text-align: left;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+            text-align: center;
         }
 
         .settings-section h3 {
             color: #333;
-            margin-bottom: 15px;
-            font-size: 1.2em;
+            margin-bottom: 20px;
+            font-size: 1.3em;
+            text-align: center;
         }
 
         .form-group {
-            margin-bottom: 15px;
-            margin-top: 20px;
-            padding-top: 20px;
+            margin-bottom: 10px;
+            margin-top: 15px;
+            padding-top: 15px;
             border-top: 1px dashed #e9ecef;
+        }
+
+        .form-group h4 {
+            color: #333;
+            margin-bottom: 8px;
+            font-size: 1em;
         }
 
         .form-group label {
             display: block;
-            margin-bottom: 5px;
+            margin-bottom: 4px;
             color: #555;
             font-weight: 500;
+            font-size: 0.9em;
         }
 
         .form-group input {
             width: 100%;
-            padding: 10px 15px;
+            padding: 8px 12px;
             border: 2px solid #ddd;
-            border-radius: 8px;
-            font-size: 1em;
+            border-radius: 6px;
+            font-size: 0.9em;
             transition: border-color 0.3s ease;
         }
 
@@ -90,9 +99,9 @@
         }
 
         .form-group .help-text {
-            font-size: 0.9em;
+            font-size: 0.8em;
             color: #666;
-            margin-top: 5px;
+            margin-top: 4px;
         }
 
         .upload-area {
@@ -322,37 +331,37 @@
         }
 
         .template-downloads {
-            margin-top: 20px;
-            padding-top: 20px;
+            margin-top: 15px;
+            padding-top: 15px;
             border-top: 1px dashed #e9ecef;
         }
 
         .template-downloads h4 {
             color: #333;
-            margin-bottom: 15px;
-            font-size: 1.1em;
+            margin-bottom: 10px;
+            font-size: 1em;
         }
 
         .template-buttons {
             display: flex;
-            gap: 10px;
+            gap: 8px;
             flex-wrap: wrap;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
         }
 
         .btn-template {
             background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
             color: white;
             border: none;
-            padding: 12px 20px;
-            border-radius: 20px;
-            font-size: 0.9em;
+            padding: 8px 15px;
+            border-radius: 15px;
+            font-size: 0.8em;
             cursor: pointer;
             transition: all 0.3s ease;
             text-decoration: none;
             display: inline-block;
             flex: 1;
-            min-width: 180px;
+            min-width: 150px;
         }
 
         .btn-template:hover {
@@ -365,23 +374,23 @@
         }
 
         .template-upload {
-            margin-bottom: 20px;
-            margin-top: 20px;
-            padding-top: 20px;
+            margin-bottom: 15px;
+            margin-top: 15px;
+            padding-top: 15px;
             border-top: 1px dashed #e9ecef;
         }
 
         .template-upload h4 {
             color: #333;
-            margin-bottom: 10px;
-            font-size: 1.1em;
+            margin-bottom: 8px;
+            font-size: 1em;
         }
 
         .template-upload-area {
-            border: 3px dashed #ddd;
-            border-radius: 15px;
-            padding: 40px 20px;
-            margin: 20px 0;
+            border: 2px dashed #ddd;
+            border-radius: 10px;
+            padding: 25px 15px;
+            margin: 15px 0;
             transition: all 0.3s ease;
             cursor: pointer;
             position: relative;
@@ -438,9 +447,9 @@
         }
 
         .template-status {
-            margin-top: 10px;
-            padding: 10px;
-            border-radius: 10px;
+            margin-top: 8px;
+            padding: 8px;
+            border-radius: 8px;
             background-color: #f8f9fa;
         }
 
@@ -451,11 +460,11 @@
         }
 
         .status-icon {
-            margin-right: 10px;
+            margin-right: 8px;
         }
 
         .status-text {
-            font-size: 1.1em;
+            font-size: 0.9em;
             color: #666;
         }
     </style>
@@ -468,7 +477,7 @@
         </div>
 
         <div class="settings-section">
-            <h3>生成设置</h3>
+            <h3>Invoice Configuration</h3>
             <div class="template-downloads">
                 <h4>Download Templates</h4>
                 <div class="template-buttons">
@@ -495,9 +504,10 @@
                 </div>
             </div>
             <div class="form-group">
-                <label for="salesTaxRate">销售税率 (%)</label>
+                <h4>Sales Tax</h4>
+                <label for="salesTaxRate">Sales Tax Rate (%)</label>
                 <input type="number" id="salesTaxRate" name="salesTaxRate" value="10" min="0" max="100" step="0.1">
-                <div class="help-text">输入销售税率百分比，例如：10 表示 10%</div>
+                <div class="help-text">Enter sales tax rate percentage, e.g., 10 for 10%</div>
             </div>
         </div>
 
