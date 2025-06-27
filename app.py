@@ -1,3 +1,4 @@
+# import packages
 import os, re, time, warnings, zipfile, tempfile, shutil
 import pandas as pd
 from datetime import datetime
@@ -12,32 +13,29 @@ from utils.docx_manipulate import populate_docx_table, convert_docx_pdf
 
 warnings.filterwarnings('ignore')
 
+# initialize flask app
 app = Flask(__name__)
 CORS(app)
 
-# 配置上传文件夹
-UPLOAD_FOLDER = 'uploads'
-TEMP_FOLDER = 'temp'
-TEMPLATE_FOLDER = 'templates'
-ALLOWED_EXTENSIONS = {'xlsx', 'xls'}
-ALLOWED_TEMPLATE_EXTENSIONS = {'docx'}
-
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-app.config['TEMP_FOLDER'] = TEMP_FOLDER
-app.config['TEMPLATE_FOLDER'] = TEMPLATE_FOLDER
+# config folders
+app.config['UPLOAD_FOLDER'] = 'uploads'
+app.config['TEMP_FOLDER'] = 'temp'
+app.config['TEMPLATE_FOLDER'] = 'templates'
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
 
-# 确保文件夹存在
-os.makedirs(UPLOAD_FOLDER, exist_ok=True)
-os.makedirs(TEMP_FOLDER, exist_ok=True)
-os.makedirs(TEMPLATE_FOLDER, exist_ok=True)
+# ensure folder exists
+os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+os.makedirs(app.config['TEMP_FOLDER'], exist_ok=True)
+os.makedirs(app.config['TEMPLATE_FOLDER'], exist_ok=True)
 
-def allowed_file(filename):
-    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+# define allowed file types
+def allowed_info_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ['xlsx', 'xls']
 
 def allowed_template_file(filename):
-    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_TEMPLATE_EXTENSIONS
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ['docx']
 
+# define routes
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -89,7 +87,7 @@ def upload_file():
             return jsonify({'error': '没有选择文件'}), 400
         
         # 检查文件类型
-        if not allowed_file(file.filename):
+        if not allowed_info_file(file.filename):
             return jsonify({'error': '不支持的文件类型，请上传Excel文件(.xlsx或.xls)'}), 400
         
         # 获取销售税率
@@ -229,7 +227,7 @@ def download_file(filename):
 def download_format_template():
     """下载发票格式模板"""
     try:
-        return send_file('invoice_format_template.docx', as_attachment=True)
+        return send_file('assets/template_invoice_format.docx', as_attachment=True)
     except FileNotFoundError:
         return jsonify({'error': '模板文件不存在'}), 404
 
@@ -237,7 +235,7 @@ def download_format_template():
 def download_info_template():
     """下载发票信息模板"""
     try:
-        return send_file('invoice_info_template.xlsx', as_attachment=True)
+        return send_file('assets/template_invoice_info.xlsx', as_attachment=True)
     except FileNotFoundError:
         return jsonify({'error': '模板文件不存在'}), 404
 
