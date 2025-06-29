@@ -118,13 +118,13 @@ def upload_file():
         if missing_columns:
             return jsonify({'error': f'Excel文件缺少必要的列: {", ".join(missing_columns)}'}), 400
 
-        # 创建临时文件夹用于存储生成的PDF
+        # 创建临时文件夹用于存储生成的Word文档
         temp_dir = os.path.join(app.config['TEMP_FOLDER'], f"invoices_{datetime.now().strftime('%Y%m%d_%H%M%S')}")
         os.makedirs(temp_dir, exist_ok=True)
 
         generated_files = []
 
-        # 为每个发票号生成PDF
+        # 为每个发票号生成Word文档
         for inv_no in inv_info['Invoice No.'].unique():
             try:
                 # 获取发票信息字典，使用用户指定的税率
@@ -132,9 +132,7 @@ def upload_file():
 
                 # 生成docx文件名
                 docx_filename = f"{item_dict['INV_NO']}.docx"
-                pdf_filename = f"{item_dict['INV_NO']}.pdf"
                 docx_path = os.path.join(temp_dir, docx_filename)
-                pdf_path = os.path.join(temp_dir, pdf_filename)
 
                 # 选择使用的模板文件
                 custom_template_path = os.path.join(app.config['TEMPLATE_FOLDER'], 'custom_template.docx')
@@ -146,27 +144,12 @@ def upload_file():
                 # 替换Word模板中的发票信息
                 populate_docx_table(item_dict, template_file, docx_path)
 
-                # 直接调用 convert_docx_pdf 进行PDF转换
-                convert_docx_pdf(docx_path, keep=False)
-
-                # 检查PDF是否生成
-                if os.path.exists(pdf_path):
-                    # 删除DOCX文件
-                    if os.path.exists(docx_path):
-                        os.remove(docx_path)
-                    # 添加生成的PDF到列表
-                    generated_files.append(pdf_filename)
+                # 检查Word文档是否生成成功
+                if os.path.exists(docx_path):
+                    # 添加生成的Word文档到列表
+                    generated_files.append(docx_filename)
                 else:
-                    # 查找生成的PDF（docx2pdf 可能生成的文件名不一致）
-                    pdf_dir = os.path.dirname(pdf_path)
-                    for file in os.listdir(pdf_dir):
-                        if file.endswith('.pdf') and os.path.splitext(os.path.basename(docx_path))[0] in file:
-                            actual_pdf = os.path.join(pdf_dir, file)
-                            shutil.move(actual_pdf, pdf_path)
-                            generated_files.append(pdf_filename)
-                            break
-                    else:
-                        return jsonify({'error': f'转换PDF失败: {item_dict["INV_NO"]}'}), 500
+                    return jsonify({'error': f'生成Word文档失败: {item_dict["INV_NO"]}'}), 500
 
             except Exception as e:
                 return jsonify({'error': f'生成发票 {inv_no} 时出错: {str(e)}'}), 500
@@ -195,10 +178,8 @@ def upload_file():
         # 确定文件类型
         file_types = set()
         for file in generated_files:
-            if file.endswith('.pdf'):
-                file_types.add('PDF')
-            elif file.endswith('.docx'):
-                file_types.add('DOCX')
+            if file.endswith('.docx'):
+                file_types.add('Word')
 
         file_type_str = ' & '.join(sorted(file_types)) if file_types else 'Unknown'
 

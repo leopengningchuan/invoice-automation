@@ -473,7 +473,7 @@
     <div class="container">
         <div class="header">
             <h1>Invoice Automation System</h1>
-            <p>Upload Excel file, automatically generate invoice PDF</p>
+            <p>Upload Excel file, automatically generate invoice Word documents</p>
         </div>
 
         <div class="settings-section">
@@ -795,14 +795,14 @@
             if (data.generated_files && data.generated_files.length > 0) {
                 fileList.innerHTML += '<li><strong>生成的文件：</strong></li>';
                 data.generated_files.forEach(file => {
-                    const fileType = file.endsWith('.pdf') ? '📄 PDF' : '📝 DOCX';
+                    const fileType = file.endsWith('.docx') ? '📝 Word' : '📄 Unknown';
                     fileList.innerHTML += `<li>• ${file} (${fileType})</li>`;
                 });
                 
                 // 显示文件类型说明
                 if (data.file_types && data.file_types.length > 0) {
-                    const typeText = data.file_types.includes('DOCX') ? 
-                        '注意：由于系统权限限制，部分文件以DOCX格式提供。您可以使用Word或其他文档编辑器打开。' : '';
+                    const typeText = data.file_types.includes('Word') ? 
+                        '文件以Word文档格式提供，您可以使用Microsoft Word或其他文档编辑器打开。' : '';
                     if (typeText) {
                         fileList.innerHTML += `<li style="color: #856404; font-style: italic;">${typeText}</li>`;
                     }
