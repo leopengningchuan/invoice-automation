@@ -8,12 +8,8 @@ from flask import Flask, request, jsonify, send_file, render_template
 from flask_cors import CORS
 from werkzeug.utils import secure_filename
 
-import sys
-import os
-sys.path.append(os.path.join(os.path.dirname(__file__), 'utils'))
-
 from invoice_info import get_inv_info
-from utils.docx_manipulate import populate_docx_table, convert_docx_pdf
+from utils_local.docx_manipulate import populate_docx_table, convert_docx_pdf
 
 warnings.filterwarnings('ignore')
 
