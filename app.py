@@ -13,6 +13,11 @@ from utils.docx_manipulate import populate_docx_table, convert_docx_pdf
 
 warnings.filterwarnings('ignore')
 
+import sys
+import os
+sys.path.append(os.path.join(os.path.dirname(__file__), 'utils'))
+
+
 # initialize flask app
 app = Flask(__name__)
 CORS(app)
@@ -47,27 +52,27 @@ def upload_template():
         # 检查是否有文件
         if 'template' not in request.files:
             return jsonify({'error': '没有选择模板文件'}), 400
-        
+
         file = request.files['template']
-        
+
         # 检查文件名
         if file.filename == '' or file.filename is None:
             return jsonify({'error': '没有选择模板文件'}), 400
-        
+
         # 检查文件类型
         if not allowed_template_file(file.filename):
             return jsonify({'error': '不支持的文件类型，请上传Word文档(.docx)'}), 400
-        
+
         # 保存模板文件
         filename = secure_filename(file.filename or '')
         template_path = os.path.join(app.config['TEMPLATE_FOLDER'], 'custom_template.docx')
         file.save(template_path)
-        
+
         return jsonify({
             'message': f'模板上传成功: {filename}',
             'template_name': filename
         })
-        
+
     except Exception as e:
         return jsonify({'error': f'上传模板时出错: {str(e)}'}), 500
 
@@ -79,17 +84,17 @@ def upload_file():
         # 检查是否有文件
         if 'file' not in request.files:
             return jsonify({'error': '没有选择文件'}), 400
-        
+
         file = request.files['file']
-        
+
         # 检查文件名
         if file.filename == '' or file.filename is None:
             return jsonify({'error': '没有选择文件'}), 400
-        
+
         # 检查文件类型
         if not allowed_info_file(file.filename):
             return jsonify({'error': '不支持的文件类型，请上传Excel文件(.xlsx或.xls)'}), 400
-        
+
         # 获取销售税率
         sales_tax_rate = request.form.get('sales_tax_rate', 0.1)  # 默认10%
         try:
@@ -98,57 +103,57 @@ def upload_file():
                 return jsonify({'error': '销售税率必须在0-100%之间'}), 400
         except ValueError:
             return jsonify({'error': '销售税率格式无效'}), 400
-        
+
         # 保存上传的文件
         filename = secure_filename(file.filename or '')
         filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
         file.save(filepath)
-        
+
         # 读取Excel文件
         try:
             inv_info = pd.read_excel(filepath)
         except Exception as e:
             return jsonify({'error': f'无法读取Excel文件: {str(e)}'}), 400
-        
+
         # 检查必要的列是否存在
-        required_columns = ['Invoice No.', 'Customer', 'Customer Address1', 'Customer Address2', 
+        required_columns = ['Invoice No.', 'Customer', 'Customer Address1', 'Customer Address2',
                           'Payment Terms', 'Invoice Date', 'Item', 'Detail', 'Unit Price', 'Quantity']
-        
+
         missing_columns = [col for col in required_columns if col not in inv_info.columns]
         if missing_columns:
             return jsonify({'error': f'Excel文件缺少必要的列: {", ".join(missing_columns)}'}), 400
-        
+
         # 创建临时文件夹用于存储生成的PDF
         temp_dir = os.path.join(app.config['TEMP_FOLDER'], f"invoices_{datetime.now().strftime('%Y%m%d_%H%M%S')}")
         os.makedirs(temp_dir, exist_ok=True)
-        
+
         generated_files = []
-        
+
         # 为每个发票号生成PDF
         for inv_no in inv_info['Invoice No.'].unique():
             try:
                 # 获取发票信息字典，使用用户指定的税率
                 item_dict = get_inv_info(inv_info, inv_no, sales_tax_rate)
-                
+
                 # 生成docx文件名
                 docx_filename = f"{item_dict['INV_NO']}.docx"
                 pdf_filename = f"{item_dict['INV_NO']}.pdf"
                 docx_path = os.path.join(temp_dir, docx_filename)
                 pdf_path = os.path.join(temp_dir, pdf_filename)
-                
+
                 # 选择使用的模板文件
                 custom_template_path = os.path.join(app.config['TEMPLATE_FOLDER'], 'custom_template.docx')
                 if os.path.exists(custom_template_path):
                     template_file = custom_template_path
                 else:
                     template_file = 'assets/template_invoice_format.docx'
-                
+
                 # 替换Word模板中的发票信息
                 populate_docx_table(item_dict, template_file, docx_path)
-                
+
                 # 直接调用 convert_docx_pdf 进行PDF转换
                 convert_docx_pdf(docx_path, keep=False)
-                
+
                 # 检查PDF是否生成
                 if os.path.exists(pdf_path):
                     # 删除DOCX文件
@@ -167,14 +172,14 @@ def upload_file():
                             break
                     else:
                         return jsonify({'error': f'转换PDF失败: {item_dict["INV_NO"]}'}), 500
-                
+
             except Exception as e:
                 return jsonify({'error': f'生成发票 {inv_no} 时出错: {str(e)}'}), 500
-        
+
         # 创建ZIP文件包含所有生成的文件
         zip_filename = f"invoices_{datetime.now().strftime('%Y%m%d_%H%M%S')}.zip"
         zip_path = os.path.join(app.config['TEMP_FOLDER'], zip_filename)
-        
+
         with zipfile.ZipFile(zip_path, 'w') as zipf:
             for file in generated_files:
                 file_path = os.path.join(temp_dir, file)
@@ -182,16 +187,16 @@ def upload_file():
                     zipf.write(file_path, file)
                 else:
                     logging.warning(f"File not found: {file_path}")
-        
+
         # 清理临时文件夹
         shutil.rmtree(temp_dir)
-        
+
         # 删除上传的Excel文件
         os.remove(filepath)
-        
+
         # 计算总处理时间
         total_time = time.time() - start_time
-        
+
         # 确定文件类型
         file_types = set()
         for file in generated_files:
@@ -199,9 +204,9 @@ def upload_file():
                 file_types.add('PDF')
             elif file.endswith('.docx'):
                 file_types.add('DOCX')
-        
+
         file_type_str = ' & '.join(sorted(file_types)) if file_types else 'Unknown'
-        
+
         return jsonify({
             'message': f'发票生成成功 (税率: {sales_tax_rate*100:.1f}%, 格式: {file_type_str})',
             'generated_files': generated_files,
@@ -211,7 +216,7 @@ def upload_file():
             'tax_rate': f'{sales_tax_rate*100:.1f}%',
             'file_types': list(file_types)
         })
-        
+
     except Exception as e:
         return jsonify({'error': f'处理文件时出错: {str(e)}'}), 500
 
@@ -267,4 +272,4 @@ def health_check():
     return jsonify({'message': '服务正常运行', 'status': 'healthy'})
 
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=8080) 
+    app.run(debug=True, host='0.0.0.0', port=8080)
