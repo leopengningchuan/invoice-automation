@@ -541,7 +541,7 @@
         </div>
 
         <div class="download-section" id="downloadSection">
-            <h3>生成完成！</h3>
+            <h3>Invoice generated successfully!</h3>
             <button class="btn" id="downloadBtn">Download Invoices (ZIP)</button>
         </div>
     </div>
@@ -672,14 +672,14 @@
             
             // 检查文件类型
             if (!file.name.match(/\.(xlsx|xls)$/i)) {
-                showStatus('请选择Excel文件 (.xlsx 或 .xls)', 'error');
+                showStatus('Please select an Excel file (.xlsx or .xls)', 'error');
                 return;
             }
 
             // 验证税率输入
             const taxRate = parseFloat(salesTaxRateInput.value);
             if (isNaN(taxRate) || taxRate < 0 || taxRate > 100) {
-                showStatus('请输入有效的销售税率 (0-100%)', 'error');
+                showStatus('Please input a valid sales tax rate (0-100%)', 'error');
                 return;
             }
 
@@ -699,10 +699,10 @@
         function showFileInfo(file, taxRate) {
             fileInfo.style.display = 'block';
             fileList.innerHTML = `
-                <li><strong>文件名：</strong>${file.name}</li>
-                <li><strong>文件大小：</strong>${formatFileSize(file.size)}</li>
-                <li><strong>文件类型：</strong>${file.type || 'Excel文件'}</li>
-                <li><strong>销售税率：</strong>${taxRate}%</li>
+                <li><strong>File Name：</strong>${file.name}</li>
+                <li><strong>File Size：</strong>${formatFileSize(file.size)}</li>
+                <li><strong>File Type：</strong>${file.type || 'Excel file'}</li>
+                <li><strong>Sales Tax Rate：</strong>${taxRate}%</li>
             `;
         }
 
@@ -752,7 +752,7 @@
                 } else {
                     // 显示处理时间
                     const processingTime = data.processing_time || timer.textContent;
-                    showStatus(`${data.message} (处理时间: ${processingTime})`, 'success');
+                    showStatus(`${data.message} (Processing time: ${processingTime})`, 'success');
                     showDownloadSection(data);
                 }
             })
@@ -793,7 +793,7 @@
             
             // 更新文件列表
             if (data.generated_files && data.generated_files.length > 0) {
-                fileList.innerHTML += '<li><strong>生成的文件：</strong></li>';
+                fileList.innerHTML += '<li><strong>Documents Generated：</strong></li>';
                 data.generated_files.forEach(file => {
                     const fileType = file.endsWith('.docx') ? '📝 Word' : '📄 Unknown';
                     fileList.innerHTML += `<li>• ${file} (${fileType})</li>`;
@@ -802,7 +802,7 @@
                 // 显示文件类型说明
                 if (data.file_types && data.file_types.length > 0) {
                     const typeText = data.file_types.includes('Word') ? 
-                        '文件以Word文档格式提供，您可以使用Microsoft Word或其他文档编辑器打开。' : '';
+                        'Documents are provided in Word format, you can open them with Microsoft Word or other document editors.' : '';
                     if (typeText) {
                         fileList.innerHTML += `<li style="color: #856404; font-style: italic;">${typeText}</li>`;
                     }
@@ -887,7 +887,7 @@
             const formData = new FormData();
             formData.append('template', file);
 
-            showStatus('正在上传模板文件...', 'info');
+            showStatus('Uploading template file...', 'info');
 
             fetch('/upload/template', {
                 method: 'POST',
@@ -906,7 +906,7 @@
                 }
             })
             .catch(error => {
-                showStatus('上传模板失败：' + error.message, 'error');
+                showStatus('Upload template failed: ' + error.message, 'error');
             })
             .finally(() => {
                 // 重置处理状态
@@ -926,7 +926,7 @@
             const filename = type === 'format' ? 'invoice_format_template.docx' : 'invoice_info_template.xlsx';
             
             // 显示下载状态
-            showStatus(`正在下载${type === 'format' ? '发票格式模板' : '发票信息模板'}...`, 'info');
+            showStatus(`Downloading ${type === 'format' ? 'Invoice format template' : 'Invoice info template'}...`, 'info');
             
             // 创建下载链接
             const link = document.createElement('a');
@@ -938,7 +938,7 @@
             
             // 显示成功消息
             setTimeout(() => {
-                showStatus(`${type === 'format' ? '发票格式模板' : '发票信息模板'}下载完成！`, 'success');
+                showStatus(`${type === 'format' ? 'Invoice format template' : 'Invoice info template'} downloaded successfully!`, 'success');
             }, 1000);
         }
     </script>

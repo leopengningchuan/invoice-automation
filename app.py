@@ -1,5 +1,5 @@
 # import packages
-import os, re, time, warnings, zipfile, tempfile, shutil
+import os, time, warnings, zipfile, shutil
 import pandas as pd
 from datetime import datetime
 import logging
@@ -28,133 +28,139 @@ os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 os.makedirs(app.config['TEMP_FOLDER'], exist_ok=True)
 os.makedirs(app.config['TEMPLATE_FOLDER'], exist_ok=True)
 
-# define allowed file types
+
+# define allowed file types for invoice info file
 def allowed_info_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ['xlsx', 'xls']
 
+
+# define allowed file types for invoice template file
 def allowed_template_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ['docx']
 
-# define routes
+
+# index route
 @app.route('/')
 def index():
     return render_template('index.html')
 
+
+# upload invoice template 
 @app.route('/upload/template', methods=['POST'])
 def upload_template():
-    """上传自定义发票模板"""
     try:
-        # 检查是否有文件
+        # check if file is uploaded
         if 'template' not in request.files:
-            return jsonify({'error': '没有选择模板文件'}), 400
+            return jsonify({'error': 'No template file selected'}), 400
 
         file = request.files['template']
 
-        # 检查文件名
+        # check if file name is empty
         if file.filename == '' or file.filename is None:
-            return jsonify({'error': '没有选择模板文件'}), 400
+            return jsonify({'error': 'No template file selected'}), 400
 
-        # 检查文件类型
+        # check if file type is allowed
         if not allowed_template_file(file.filename):
-            return jsonify({'error': '不支持的文件类型，请上传Word文档(.docx)'}), 400
+            return jsonify({'error': 'Unsupported file type, please upload a Word document (.docx)'}), 400
 
-        # 保存模板文件
+        # save template file
         filename = secure_filename(file.filename or '')
         template_path = os.path.join(app.config['TEMPLATE_FOLDER'], 'custom_template.docx')
         file.save(template_path)
 
         return jsonify({
-            'message': f'模板上传成功: {filename}',
+            'message': f'Template uploaded successfully: {filename}',
             'template_name': filename
         })
 
     except Exception as e:
-        return jsonify({'error': f'上传模板时出错: {str(e)}'}), 500
+        return jsonify({'error': f'Error uploading template: {str(e)}'}), 500
 
+
+# upload invoice info file
 @app.route('/upload', methods=['POST'])
 def upload_file():
-    """处理Excel文件上传和Invoice生成"""
     start_time = time.time()
     try:
-        # 检查是否有文件
+        # check if file is uploaded
         if 'file' not in request.files:
-            return jsonify({'error': '没有选择文件'}), 400
+            return jsonify({'error': 'No file selected'}), 400
 
         file = request.files['file']
 
-        # 检查文件名
+        # check if file name is empty
         if file.filename == '' or file.filename is None:
-            return jsonify({'error': '没有选择文件'}), 400
+            return jsonify({'error': 'No file selected'}), 400
 
-        # 检查文件类型
+        # check if file type is allowed
         if not allowed_info_file(file.filename):
-            return jsonify({'error': '不支持的文件类型，请上传Excel文件(.xlsx或.xls)'}), 400
+            return jsonify({'error': 'Unsupported file type, please upload an Excel file (.xlsx or .xls)'}), 400
 
-        # 获取销售税率
-        sales_tax_rate = request.form.get('sales_tax_rate', 0.1)  # 默认10%
+        # get sales tax rate
+        sales_tax_rate = request.form.get('sales_tax_rate', 0.1)  # default 10%
         try:
             sales_tax_rate = float(sales_tax_rate)
             if sales_tax_rate < 0 or sales_tax_rate > 1:
-                return jsonify({'error': '销售税率必须在0-100%之间'}), 400
+                return jsonify({'error': 'Sales tax rate must be between 0-100%'}), 400
         except ValueError:
-            return jsonify({'error': '销售税率格式无效'}), 400
+            return jsonify({'error': 'Sales tax rate format invalid'}), 400
 
-        # 保存上传的文件
+        # save uploaded file
         filename = secure_filename(file.filename or '')
         filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
         file.save(filepath)
 
-        # 读取Excel文件
+        # read Excel file
         try:
             inv_info = pd.read_excel(filepath)
         except Exception as e:
-            return jsonify({'error': f'无法读取Excel文件: {str(e)}'}), 400
+            return jsonify({'error': f'Cannot read Excel file: {str(e)}'}), 400
 
-        # 检查必要的列是否存在
+        # check if required columns exist
         required_columns = ['Invoice No.', 'Customer', 'Customer Address1', 'Customer Address2',
                           'Payment Terms', 'Invoice Date', 'Item', 'Detail', 'Unit Price', 'Quantity']
 
         missing_columns = [col for col in required_columns if col not in inv_info.columns]
         if missing_columns:
-            return jsonify({'error': f'Excel文件缺少必要的列: {", ".join(missing_columns)}'}), 400
+            return jsonify({'error': f'"Required columns missing: {", ".join(missing_columns)}'}), 400
 
-        # 创建临时文件夹用于存储生成的Word文档
+        # create temporary folder for storing generated Word documents
         temp_dir = os.path.join(app.config['TEMP_FOLDER'], f"invoices_{datetime.now().strftime('%Y%m%d_%H%M%S')}")
         os.makedirs(temp_dir, exist_ok=True)
 
         generated_files = []
 
-        # 为每个发票号生成Word文档
+        # generate Word document for each invoice number
         for inv_no in inv_info['Invoice No.'].unique():
             try:
-                # 获取发票信息字典，使用用户指定的税率
+                # get invoice info dictionary, using user specified tax rate
                 item_dict = get_inv_info(inv_info, inv_no, sales_tax_rate)
 
-                # 生成docx文件名
+                # generate docx file name
                 docx_filename = f"{item_dict['INV_NO']}.docx"
                 docx_path = os.path.join(temp_dir, docx_filename)
 
-                # 选择使用的模板文件
+                # select the template file to use
                 custom_template_path = os.path.join(app.config['TEMPLATE_FOLDER'], 'custom_template.docx')
                 if os.path.exists(custom_template_path):
                     template_file = custom_template_path
                 else:
                     template_file = 'assets/template_invoice_format.docx'
 
-                # 替换Word模板中的发票信息
+                # replace invoice info in Word template
                 populate_docx_table(item_dict, template_file, docx_path)
 
-                # 检查Word文档是否生成成功
+                # check if Word document is generated successfully
                 if os.path.exists(docx_path):
-                    # 添加生成的Word文档到列表
+                    # add generated Word document to list
                     generated_files.append(docx_filename)
                 else:
-                    return jsonify({'error': f'生成Word文档失败: {item_dict["INV_NO"]}'}), 500
+                    return jsonify({'error': f'Failed to generate Word document: {item_dict["INV_NO"]}'}), 500
 
             except Exception as e:
-                return jsonify({'error': f'生成发票 {inv_no} 时出错: {str(e)}'}), 500
+                return jsonify({'error': f'Error generating invoice {inv_no}: {str(e)}'}), 500
 
-        # 创建ZIP文件包含所有生成的文件
+        # create ZIP file containing all generated files
         zip_filename = f"invoices_{datetime.now().strftime('%Y%m%d_%H%M%S')}.zip"
         zip_path = os.path.join(app.config['TEMP_FOLDER'], zip_filename)
 
@@ -166,16 +172,16 @@ def upload_file():
                 else:
                     logging.warning(f"File not found: {file_path}")
 
-        # 清理临时文件夹
+        # clean up temporary folder
         shutil.rmtree(temp_dir)
 
-        # 删除上传的Excel文件
+        # delete uploaded Excel file
         os.remove(filepath)
 
-        # 计算总处理时间
+        # calculate total processing time
         total_time = time.time() - start_time
 
-        # 确定文件类型
+        # determine file types
         file_types = set()
         for file in generated_files:
             if file.endswith('.docx'):
@@ -184,68 +190,73 @@ def upload_file():
         file_type_str = ' & '.join(sorted(file_types)) if file_types else 'Unknown'
 
         return jsonify({
-            'message': f'发票生成成功 (税率: {sales_tax_rate*100:.1f}%, 格式: {file_type_str})',
+            'message': f'Invoice generated successfully (Tax rate: {sales_tax_rate*100:.1f}%, Format: {file_type_str})',
             'generated_files': generated_files,
             'zip_file': zip_filename,
             'download_url': f'/download/{zip_filename}',
-            'processing_time': f'{total_time:.1f}秒',
+            'processing_time': f'{total_time:.1f}s',
             'tax_rate': f'{sales_tax_rate*100:.1f}%',
             'file_types': list(file_types)
         })
 
     except Exception as e:
-        return jsonify({'error': f'处理文件时出错: {str(e)}'}), 500
+        return jsonify({'error': f'Error processing file: {str(e)}'}), 500
 
+
+# download generated invoices zip file
 @app.route('/download/<filename>')
 def download_file(filename):
-    """下载生成的ZIP文件"""
     try:
         return send_file(os.path.join(app.config['TEMP_FOLDER'], filename), as_attachment=True)
     except FileNotFoundError:
-        return jsonify({'error': '文件不存在'}), 404
+        return jsonify({'error': f'{filename} not found'}), 404
 
+
+# download invoice info template
 @app.route('/download/template/format')
 def download_format_template():
-    """下载发票格式模板"""
     try:
         return send_file('assets/template_invoice_format.docx', as_attachment=True)
     except FileNotFoundError:
-        return jsonify({'error': '模板文件不存在'}), 404
+        return jsonify({'error': 'Invoice info template not found'}), 404
 
+
+# download invoice format template
 @app.route('/download/template/info')
 def download_info_template():
-    """下载发票信息模板"""
     try:
         return send_file('assets/template_invoice_info.xlsx', as_attachment=True)
     except FileNotFoundError:
-        return jsonify({'error': '模板文件不存在'}), 404
+        return jsonify({'error': 'Invoice format template not found'}), 404
 
+
+# template status check
 @app.route('/template/status')
 def template_status():
-    """检查当前模板状态"""
     try:
         custom_template_path = os.path.join(app.config['TEMPLATE_FOLDER'], 'custom_template.docx')
         if os.path.exists(custom_template_path):
-            # 获取文件信息
-            stat = os.stat(custom_template_path)
+            
             return jsonify({
                 'has_custom_template': True,
                 'template_name': 'custom_template.docx',
-                'upload_time': datetime.fromtimestamp(stat.st_mtime).strftime('%Y-%m-%d %H:%M:%S'),
-                'file_size': stat.st_size
+                'upload_time': datetime.fromtimestamp(os.stat(custom_template_path).st_mtime).strftime('%Y-%m-%d %H:%M:%S'),
+                'file_size': os.stat(custom_template_path).st_size
             })
         else:
             return jsonify({
                 'has_custom_template': False,
-                'template_name': 'template_invoice_format.docx (默认模板)'
+                'template_name': 'template_invoice_format.docx'
             })
     except Exception as e:
-        return jsonify({'error': f'检查模板状态时出错: {str(e)}'}), 500
+        return jsonify({'error': f'Error checking template status: {str(e)}'}), 500
 
+
+# app health check
 @app.route('/health')
 def health_check():
-    """健康检查端点"""
-    return jsonify({'message': '服务正常运行', 'status': 'healthy'})
+    return jsonify({'message': 'Service is running normally', 'status': 'healthy'})
+
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=8080)
