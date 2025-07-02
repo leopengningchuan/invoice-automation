@@ -560,7 +560,7 @@
         const downloadSection = document.getElementById('downloadSection');
         const downloadBtn = document.getElementById('downloadBtn');
         
-        // 模板上传相关元素
+        // template upload
         const templateUploadArea = document.getElementById('templateUploadArea');
         const templateInput = document.getElementById('templateInput');
         const templateStatus = document.getElementById('templateStatus');
@@ -568,10 +568,10 @@
         let currentDownloadUrl = '';
         let startTime = null;
         let timerInterval = null;
-        let isProcessing = false; // 防止重复处理
-        let isTemplateProcessing = false; // 防止模板重复处理
+        let isProcessing = false; // prevent duplicate processing
+        let isTemplateProcessing = false; // prevent duplicate template processing
 
-        // 拖拽上传功能
+        // drag and drop upload
         uploadArea.addEventListener('dragover', (e) => {
             e.preventDefault();
             uploadArea.classList.add('dragover');
@@ -591,10 +591,10 @@
         });
 
         uploadArea.addEventListener('click', (e) => {
-            // 防止重复点击
+            // prevent duplicate click
             if (isProcessing) return;
             
-            // 确保点击的是上传区域本身，而不是文件输入框
+            // ensure the click is on the upload area, not the file input
             if (e.target === uploadArea || e.target.closest('.upload-icon') || 
                 e.target.closest('.upload-text') || e.target.closest('.upload-subtext')) {
                 fileInput.click();
@@ -608,7 +608,7 @@
             }
         });
 
-        // 模板上传功能
+        // template upload
         templateUploadArea.addEventListener('dragover', (e) => {
             e.preventDefault();
             templateUploadArea.classList.add('dragover');
@@ -628,10 +628,10 @@
         });
 
         templateUploadArea.addEventListener('click', (e) => {
-            // 防止重复点击
+            // prevent duplicate click
             if (isTemplateProcessing) return;
             
-            // 确保点击的是上传区域本身，而不是文件输入框
+            // ensure the click is on the upload area, not the file input
             if (e.target === templateUploadArea || e.target.closest('.upload-icon') || 
                 e.target.closest('.upload-text') || e.target.closest('.upload-subtext')) {
                 templateInput.click();
@@ -667,32 +667,32 @@
         }
 
         function handleFile(file) {
-            // 防止重复处理
+            // prevent duplicate processing
             if (isProcessing) return;
             
-            // 检查文件类型
+            // check file type
             if (!file.name.match(/\.(xlsx|xls)$/i)) {
                 showStatus('Please select an Excel file (.xlsx or .xls)', 'error');
                 return;
             }
 
-            // 验证税率输入
+            // validate tax rate input
             const taxRate = parseFloat(salesTaxRateInput.value);
             if (isNaN(taxRate) || taxRate < 0 || taxRate > 100) {
                 showStatus('Please input a valid sales tax rate (0-100%)', 'error');
                 return;
             }
 
-            // 设置处理状态
+            // set processing status
             isProcessing = true;
             
-            // 添加上传区域的视觉反馈
+            // add visual feedback to the upload area
             uploadArea.classList.add('processing');
 
-            // 显示文件信息
+            // show file information
             showFileInfo(file, taxRate);
             
-            // 上传文件
+            // upload file
             uploadFile(file, taxRate);
         }
 
@@ -717,16 +717,16 @@
         function uploadFile(file, taxRate) {
             const formData = new FormData();
             formData.append('file', file);
-            formData.append('sales_tax_rate', taxRate / 100); // 转换为小数
+            formData.append('sales_tax_rate', taxRate / 100); // convert to decimal
 
-            // 显示进度条和开始计时
+            // show progress bar and start timer
             progressContainer.style.display = 'block';
             progressFill.style.width = '0%';
             progressText.innerHTML = '<span class="loading"></span>正在上传文件...';
             hideStatus();
             startTimer();
 
-            // 模拟上传进度
+            // simulate upload progress
             let progress = 0;
             const progressInterval = setInterval(() => {
                 progress += Math.random() * 30;
@@ -750,7 +750,7 @@
                 if (data.error) {
                     showStatus(data.error, 'error');
                 } else {
-                    // 显示处理时间
+                    // show processing time
                     const processingTime = data.processing_time || timer.textContent;
                     showStatus(`${data.message} (Processing time: ${processingTime})`, 'success');
                     showDownloadSection(data);
@@ -762,13 +762,13 @@
                 showStatus('上传失败：' + error.message, 'error');
             })
             .finally(() => {
-                // 重置处理状态
+                // reset processing status
                 isProcessing = false;
                 
-                // 移除上传区域的视觉反馈
+                // remove visual feedback from the upload area
                 uploadArea.classList.remove('processing');
                 
-                // 清空文件输入框，允许重新选择相同文件
+                // clear file input, allow re-selecting the same file
                 fileInput.value = '';
                 
                 setTimeout(() => {
@@ -791,7 +791,7 @@
             downloadSection.style.display = 'block';
             currentDownloadUrl = data.download_url;
             
-            // 更新文件列表
+            // update file list
             if (data.generated_files && data.generated_files.length > 0) {
                 fileList.innerHTML += '<li><strong>Documents Generated：</strong></li>';
                 data.generated_files.forEach(file => {
@@ -799,7 +799,7 @@
                     fileList.innerHTML += `<li>• ${file} (${fileType})</li>`;
                 });
                 
-                // 显示文件类型说明
+                // show file type description
                 if (data.file_types && data.file_types.length > 0) {
                     const typeText = data.file_types.includes('Word') ? 
                         'Documents are provided in Word format, you can open them with Microsoft Word or other document editors.' : '';
@@ -816,22 +816,22 @@
             }
         });
 
-        // 页面加载时检查服务状态
+        // check service status when page loads
         window.addEventListener('load', () => {
             fetch('/health')
                 .then(response => response.json())
                 .then(data => {
-                    // 服务正常，无需显示任何信息
+                    // service is normal, no need to show any information
                 })
                 .catch(error => {
                     showStatus('无法连接到服务器，请确保后端服务正在运行', 'error');
                 });
             
-            // 检查模板状态
+            // check template status
             checkTemplateStatus();
         });
 
-        // 检查模板状态
+        // check template status
         function checkTemplateStatus() {
             fetch('/template/status')
                 .then(response => response.json())
@@ -843,7 +843,7 @@
                 });
         }
 
-        // 更新模板状态显示
+        // update template status display
         function updateTemplateStatus(data) {
             const statusInfo = templateStatus.querySelector('.status-info');
             if (data.has_custom_template) {
@@ -861,28 +861,28 @@
             }
         }
 
-        // 处理模板文件上传
+        // handle template file upload
         function handleTemplateFile(file) {
-            // 防止重复处理
+            // prevent duplicate processing
             if (isTemplateProcessing) return;
             
-            // 检查文件类型
+            // check file type
             if (!file.name.match(/\.docx$/i)) {
                 showStatus('请选择Word文档文件 (.docx)', 'error');
                 return;
             }
 
-            // 设置处理状态
+            // set processing status
             isTemplateProcessing = true;
             
-            // 添加上传区域的视觉反馈
+            // add visual feedback to the upload area
             templateUploadArea.classList.add('processing');
 
-            // 上传模板文件
+            // upload template file
             uploadTemplateFile(file);
         }
 
-        // 上传模板文件
+        // upload template file
         function uploadTemplateFile(file) {
             const formData = new FormData();
             formData.append('template', file);
@@ -901,7 +901,7 @@
                     showStatus(data.error, 'error');
                 } else {
                     showStatus(data.message, 'success');
-                    // 更新模板状态
+                    // update template status
                     checkTemplateStatus();
                 }
             })
@@ -909,26 +909,26 @@
                 showStatus('Upload template failed: ' + error.message, 'error');
             })
             .finally(() => {
-                // 重置处理状态
+                // reset processing status
                 isTemplateProcessing = false;
                 
-                // 移除上传区域的视觉反馈
+                // remove visual feedback from the upload area
                 templateUploadArea.classList.remove('processing');
                 
-                // 清空文件输入框
+                // clear file input
                 templateInput.value = '';
             });
         }
 
-        // 模板下载函数
+        // template download function
         function downloadTemplate(type) {
             const url = type === 'format' ? '/download/template/format' : '/download/template/info';
             const filename = type === 'format' ? 'invoice_format_template.docx' : 'invoice_info_template.xlsx';
             
-            // 显示下载状态
+            // show download status
             showStatus(`Downloading ${type === 'format' ? 'Invoice format template' : 'Invoice info template'}...`, 'info');
             
-            // 创建下载链接
+            // create download link
             const link = document.createElement('a');
             link.href = url;
             link.download = filename;
@@ -936,7 +936,7 @@
             link.click();
             document.body.removeChild(link);
             
-            // 显示成功消息
+            // show success message
             setTimeout(() => {
                 showStatus(`${type === 'format' ? 'Invoice format template' : 'Invoice info template'} downloaded successfully!`, 'success');
             }, 1000);
