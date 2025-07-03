@@ -12,8 +12,8 @@ Mass invoice generation and automation tool
   - [4. DOCX Invoice Generation with Placeholder Replacement](#4-docx-invoice-generation-with-placeholder-replacement)
   - [5. Convert DOCX Files to PDF Files](#5-convert-docx-files-to-pdf-files)
   - [6. Online Deployment](#6-online-deployment)
-    - [6.1 Backend](#6-backend)
-    - [6.2 Frontend](#6-frontend)
+    - [6.1 Backend](#61-backend)
+    - [6.2 Frontend](#62-frontend)
 - [Future Improvements](#future-improvements)
 - [License](#license)
 
