@@ -29,10 +29,22 @@ This project aims to automate the generation of company invoices in PDF by using
 - `.gitattributes` – git attributes config
 - `.gitmodules` – git submodules config
 - [`utils/`](https://github.com/leopengningchuan/personal_utils) – submodule used
+- `utils_local/` – submodule copied to local for online deployment
+- `sync_utils_to_local.py` –  script to copy submodule contents from `utils/` to `utils_local/`
+- `Procfile` – declares how to run the app in production
+- `requirements.txt` – list of Python dependencies required for the project
+- `build.sh` – shell script to initialize submodules, install dependencies, and start the app
+- `invoice_info.py` – python script for getting invoice information
 - `invoice_automation.ipynb` – notebook for invoice generation  
 - `inv_info_sample.xlsx`– sample invoice input data XLSX
-- `inv_template.docx` – invoice template DOCX
-- `SAMCO_1–4.pdf` – sample output PDF
+- `assets`: - 
+  - `template_invoice_format.docx` – invoice format template DOCX
+  - `template_invoice_info.xlsx` – invoice info template XLSX
+  - `invoice_format_sample.docx` – invoice format sample DOCX
+  - `inv_info_sample.xlsx` – invoice info sample XLSX
+- `templates`: - frontend HTML templates 
+  - `index.html` – mail HTML form interface
+- `app.py`  – mail backend code
 
 ## Instructions
 
