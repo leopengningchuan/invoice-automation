@@ -11,6 +11,9 @@ Mass invoice generation and automation tool
   - [3. Build Invoice Data Dictionary](#3-build-invoice-data-dictionary)
   - [4. DOCX Invoice Generation with Placeholder Replacement](#4-docx-invoice-generation-with-placeholder-replacement)
   - [5. Convert DOCX Files to PDF Files](#5-convert-docx-files-to-pdf-files)
+  - [6. Online Deployment](#6-online-deployment)
+    - [6.1 Backend](#6-backend)
+    - [6.2 Frontend](#6-frontend)
 - [Future Improvements](#future-improvements)
 - [License](#license)
 
@@ -22,29 +25,36 @@ To address these challenges, this project was developed to automate the invoice 
 ## Project Goal
 This project aims to automate the generation of company invoices in PDF by using **Python Jupyter Notebook**, **Microsoft Excel** and **Microsoft Word**. It is designed to process large-scale customer sales data efficiently, ensuring accurate, consistent, and scalable invoice creation with minimal manual intervention.
 
+The system supports both local execution with full functionality and cloud deployment for convenient online access with [*Railway*](https://railway.com).
+
 ## File Structure
+
+Configuration & Metadata:
 - `README.md` – project overview
 - `LICENSE.txt` – license information
 - `.gitignore` – git ignore config
 - `.gitattributes` – git attributes config
 - `.gitmodules` – git submodules config
+
+Core Logic:
 - [`utils/`](https://github.com/leopengningchuan/personal_utils) – submodule used
-- `utils_local/` – submodule copied to local for online deployment
-- `sync_utils_to_local.py` –  script to copy submodule contents from `utils/` to `utils_local/`
-- `Procfile` – declares how to run the app in production
-- `requirements.txt` – list of Python dependencies required for the project
-- `build.sh` – shell script to initialize submodules, install dependencies, and start the app
 - `invoice_info.py` – python script for getting invoice information
-- `invoice_automation.ipynb` – notebook for invoice generation  
-- `inv_info_sample.xlsx`– sample invoice input data XLSX
-- `assets`: - 
+- `invoice_automation.ipynb` – notebook for invoice generation
+- `assets`: – supporting resource files
   - `template_invoice_format.docx` – invoice format template DOCX
   - `template_invoice_info.xlsx` – invoice info template XLSX
   - `invoice_format_sample.docx` – invoice format sample DOCX
   - `inv_info_sample.xlsx` – invoice info sample XLSX
-- `templates`: - frontend HTML templates 
-  - `index.html` – mail HTML form interface
-- `app.py`  – mail backend code
+
+Online Deployment:
+- `utils_local/` – submodule copied to local for online deployment
+- `sync_utils_to_local.py` – script to copy submodule contents to local for online deployment
+- `Procfile` – declares how to run the app in production
+- `requirements.txt` – required Python dependencies
+- `app.py` – backend server
+- `templates`: – frontend HTML templates
+  - `index.html` – main HTML form interface
+
 
 ## Instructions
 
@@ -81,9 +91,17 @@ The `utils/` folder is included as a Git submodule and contains a reusable funct
 ### 5. Convert DOCX Files to PDF Files
 After each invoice is generated as a DOCX file, it is immediately converted into a PDF file for final output. To keep the workspace clean and prevent duplication, the intermediate DOCX file is automatically deleted after the PDF is successfully created.
 
+### 6. Online Deployment
+This project is configured for cloud deployment to services like [*Railway*](https://railway.com), allowing the application to run fully online without local setup.
+
+#### 6.1 Backend
+The backend, built with Flask, handles invoice template downloads, invoice data uploads, and file processing. Due to limitations in cloud environments, DOCX to PDF conversion is not supported (since [`docx2pdf`](https://pypi.org/project/docx2pdf/) requires Microsoft Word). As a result, the system generates and provides DOCX files for download in the online deployment.
+
+#### 6.2 Frontend
+The frontend provides an HTML interface that allows users to download templates, upload XLS/XLSX files, generate invoices, and download the resulting DOCX files. It communicates with the backend via HTTP POST requests and is designed for easy access via a web browser.
+
 ## Future Improvements
 - **Duplicate Invoice Detection**: Add a check to flag or prevent generation of duplicate invoices based on invoice number or client name.
-- **Web Interface**: Build a lightweight front-end interface to allow non-technical users to upload invoice data and download results without using Jupyter or the command line.
 - **Email Integration**: Add functionality to automatically send generated invoices via email to clients, with customizable messages and attachments.
 
 ## License

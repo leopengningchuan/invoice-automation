@@ -13,7 +13,7 @@
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #87CEEB 0%, #4682B4 100%);
             min-height: 100vh;
             display: flex;
             align-items: center;
@@ -95,7 +95,7 @@
 
         .form-group input:focus {
             outline: none;
-            border-color: #667eea;
+            border-color: #4682B4;
         }
 
         .form-group .help-text {
@@ -116,13 +116,13 @@
         }
 
         .upload-area:hover {
-            border-color: #667eea;
-            background-color: #f8f9ff;
+            border-color: #4682B4;
+            background-color: #f0f8ff;
         }
 
         .upload-area.dragover {
-            border-color: #667eea;
-            background-color: #f0f4ff;
+            border-color: #4682B4;
+            background-color: #e6f3ff;
             transform: scale(1.02);
         }
 
@@ -138,7 +138,7 @@
 
         .upload-icon {
             font-size: 4em;
-            color: #667eea;
+            color: #4682B4;
             margin-bottom: 20px;
         }
 
@@ -167,7 +167,7 @@
         }
 
         .btn {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #87CEEB 0%, #4682B4 100%);
             color: white;
             border: none;
             padding: 15px 30px;
@@ -182,7 +182,7 @@
 
         .btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+            box-shadow: 0 10px 20px rgba(70, 130, 180, 0.3);
         }
 
         .btn:disabled {
@@ -208,7 +208,7 @@
 
         .progress-fill {
             height: 100%;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #87CEEB 0%, #4682B4 100%);
             width: 0%;
             transition: width 0.3s ease;
         }
@@ -276,7 +276,7 @@
             width: 20px;
             height: 20px;
             border: 3px solid #f3f3f3;
-            border-top: 3px solid #667eea;
+            border-top: 3px solid #4682B4;
             border-radius: 50%;
             animation: spin 1s linear infinite;
             margin-right: 10px;
@@ -325,7 +325,7 @@
 
         .timer {
             font-size: 1.1em;
-            color: #667eea;
+            color: #4682B4;
             font-weight: bold;
             margin: 10px 0;
         }
@@ -398,13 +398,13 @@
         }
 
         .template-upload-area:hover {
-            border-color: #667eea;
-            background-color: #f8f9ff;
+            border-color: #4682B4;
+            background-color: #f0f8ff;
         }
 
         .template-upload-area.dragover {
-            border-color: #667eea;
-            background-color: #f0f4ff;
+            border-color: #4682B4;
+            background-color: #e6f3ff;
             transform: scale(1.02);
         }
 
@@ -420,7 +420,7 @@
 
         .template-upload-icon {
             font-size: 4em;
-            color: #667eea;
+            color: #4682B4;
             margin-bottom: 20px;
         }
 
@@ -722,7 +722,7 @@
             // show progress bar and start timer
             progressContainer.style.display = 'block';
             progressFill.style.width = '0%';
-            progressText.innerHTML = '<span class="loading"></span>正在上传文件...';
+            progressText.innerHTML = '<span class="loading"></span>Uploading file...';
             hideStatus();
             startTimer();
 
@@ -744,7 +744,7 @@
             .then(data => {
                 clearInterval(progressInterval);
                 progressFill.style.width = '100%';
-                progressText.textContent = '处理完成！';
+                progressText.textContent = 'Processing completed!';
                 stopTimer();
 
                 if (data.error) {
@@ -759,7 +759,7 @@
             .catch(error => {
                 clearInterval(progressInterval);
                 stopTimer();
-                showStatus('上传失败：' + error.message, 'error');
+                showStatus('Upload failed: ' + error.message, 'error');
             })
             .finally(() => {
                 // reset processing status
@@ -824,7 +824,7 @@
                     // service is normal, no need to show any information
                 })
                 .catch(error => {
-                    showStatus('无法连接到服务器，请确保后端服务正在运行', 'error');
+                    showStatus('Cannot connect to server, please ensure the backend service is running', 'error');
                 });
             
             // check template status
@@ -839,7 +839,7 @@
                     updateTemplateStatus(data);
                 })
                 .catch(error => {
-                    console.error('检查模板状态失败:', error);
+                    console.error('Failed to check template status:', error);
                 });
         }
 
@@ -868,7 +868,7 @@
             
             // check file type
             if (!file.name.match(/\.docx$/i)) {
-                showStatus('请选择Word文档文件 (.docx)', 'error');
+                showStatus('Please select a Word document file (.docx)', 'error');
                 return;
             }
 
