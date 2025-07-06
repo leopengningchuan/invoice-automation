@@ -1,0 +1,946 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoice Automation System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #87CEEB 0%, #4682B4 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .header {
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: #333;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 1.1em;
+        }
+
+        .settings-section {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .settings-section h3 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.3em;
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 10px;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px dashed #e9ecef;
+        }
+
+        .form-group h4 {
+            color: #333;
+            margin-bottom: 8px;
+            font-size: 1em;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 4px;
+            color: #555;
+            font-weight: 500;
+            font-size: 0.9em;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 8px 12px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            font-size: 0.9em;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #4682B4;
+        }
+
+        .form-group .help-text {
+            font-size: 0.8em;
+            color: #666;
+            margin-top: 4px;
+        }
+
+        .upload-area {
+            border: 3px dashed #ddd;
+            border-radius: 15px;
+            padding: 40px 20px;
+            margin: 30px 0;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            z-index: 0;
+        }
+
+        .upload-area:hover {
+            border-color: #4682B4;
+            background-color: #f0f8ff;
+        }
+
+        .upload-area.dragover {
+            border-color: #4682B4;
+            background-color: #e6f3ff;
+            transform: scale(1.02);
+        }
+
+        .upload-area.processing {
+            opacity: 0.6;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
+        .upload-area.processing .upload-text {
+            color: #999;
+        }
+
+        .upload-icon {
+            font-size: 4em;
+            color: #4682B4;
+            margin-bottom: 20px;
+        }
+
+        .upload-text {
+            font-size: 1.2em;
+            color: #333;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .upload-subtext {
+            color: #666;
+            font-size: 0.9em;
+            text-align: center;
+        }
+
+        .file-input {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+            z-index: 1;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #87CEEB 0%, #4682B4 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 10px;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(70, 130, 180, 0.3);
+        }
+
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .progress-container {
+            margin: 20px 0;
+            display: none;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background-color: #f0f0f0;
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #87CEEB 0%, #4682B4 100%);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .status {
+            margin: 20px 0;
+            padding: 15px;
+            border-radius: 10px;
+            display: none;
+        }
+
+        .status.success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .status.error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .status.info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        .file-info {
+            margin: 20px 0;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            display: none;
+        }
+
+        .file-info h3 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .file-list {
+            list-style: none;
+            text-align: left;
+        }
+
+        .file-list li {
+            padding: 5px 0;
+            color: #666;
+        }
+
+        .download-section {
+            margin-top: 30px;
+            display: none;
+        }
+
+        .download-section h3 {
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #4682B4;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .requirements {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            text-align: left;
+        }
+
+        .requirements h4 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 1em;
+        }
+
+        .requirements ul {
+            list-style: none;
+            padding-left: 0;
+            margin: 0;
+        }
+
+        .requirements li {
+            padding: 3px 0;
+            color: #666;
+            position: relative;
+            padding-left: 18px;
+            font-size: 0.9em;
+        }
+
+        .requirements li:before {
+            content: "✓";
+            color: #28a745;
+            font-weight: bold;
+            position: absolute;
+            left: 0;
+        }
+
+        .timer {
+            font-size: 1.1em;
+            color: #4682B4;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+
+        .template-downloads {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px dashed #e9ecef;
+        }
+
+        .template-downloads h4 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 1em;
+        }
+
+        .template-buttons {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 8px;
+        }
+
+        .btn-template {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 15px;
+            font-size: 0.8em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            flex: 1;
+            min-width: 150px;
+        }
+
+        .btn-template:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 15px rgba(40, 167, 69, 0.3);
+        }
+
+        .btn-template:active {
+            transform: translateY(0);
+        }
+
+        .template-upload {
+            margin-bottom: 15px;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px dashed #e9ecef;
+        }
+
+        .template-upload h4 {
+            color: #333;
+            margin-bottom: 8px;
+            font-size: 1em;
+        }
+
+        .template-upload-area {
+            border: 2px dashed #ddd;
+            border-radius: 10px;
+            padding: 25px 15px;
+            margin: 15px 0;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            z-index: 0;
+        }
+
+        .template-upload-area:hover {
+            border-color: #4682B4;
+            background-color: #f0f8ff;
+        }
+
+        .template-upload-area.dragover {
+            border-color: #4682B4;
+            background-color: #e6f3ff;
+            transform: scale(1.02);
+        }
+
+        .template-upload-area.processing {
+            opacity: 0.6;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
+        .template-upload-area.processing .upload-text {
+            color: #999;
+        }
+
+        .template-upload-icon {
+            font-size: 4em;
+            color: #4682B4;
+            margin-bottom: 20px;
+        }
+
+        .template-upload-text {
+            font-size: 1.2em;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .template-upload-subtext {
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .template-upload-file-input {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+            z-index: 1;
+        }
+
+        .template-status {
+            margin-top: 8px;
+            padding: 8px;
+            border-radius: 8px;
+            background-color: #f8f9fa;
+        }
+
+        .status-info {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .status-icon {
+            margin-right: 8px;
+        }
+
+        .status-text {
+            font-size: 0.9em;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Invoice Automation System</h1>
+            <p>Upload Excel file, automatically generate invoice Word documents</p>
+        </div>
+
+        <div class="settings-section">
+            <h3>Invoice Configuration</h3>
+            <div class="template-downloads">
+                <h4>Download Templates</h4>
+                <div class="template-buttons">
+                    <button class="btn btn-template" onclick="downloadTemplate('format')">
+                        Download Invoice Format Template
+                    </button>
+                    <button class="btn btn-template" onclick="downloadTemplate('info')">
+                        Download Invoice Info Template
+                    </button>
+                </div>
+            </div>
+            <div class="template-upload">
+                <h4>Upload Custom Template</h4>
+                <div class="template-upload-area" id="templateUploadArea">
+                    <div class="upload-text">Select your custom invoice template</div>
+                    <div class="upload-subtext">Supporting .docx file only</div>
+                    <input type="file" id="templateInput" class="file-input" accept=".docx">
+                </div>
+                <div class="template-status" id="templateStatus">
+                    <div class="status-info">
+                        <span class="status-icon">ℹ️</span>
+                        <span class="status-text">Using default template</span>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <h4>Sales Tax</h4>
+                <label for="salesTaxRate">Sales Tax Rate (%)</label>
+                <input type="number" id="salesTaxRate" name="salesTaxRate" value="10" min="0" max="100" step="0.1">
+                <div class="help-text">Enter sales tax rate percentage, e.g., 10 for 10%</div>
+            </div>
+        </div>
+
+        <div class="upload-area" id="uploadArea">
+            <div class="upload-text">Select your Excel file here</div>
+            <div class="upload-subtext">Supporting .xlsx and .xls file</div>
+            <input type="file" id="fileInput" class="file-input" accept=".xlsx,.xls">
+            <div class="requirements">
+                <h4>Excel File Requirements</h4>
+                <ul>
+                    <li>Please ensure that all required fields in the Excel file are completed</li>
+                    <li>Each invoice number may include multiple line items</li>
+                    <li>Subtotals, tax, and the final amount will be automatically calculated</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="progress-container" id="progressContainer">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div id="progressText">Processing...</div>
+            <div class="timer" id="timer">00:00</div>
+        </div>
+
+        <div class="status" id="status"></div>
+
+        <div class="file-info" id="fileInfo">
+            <h3>File Information</h3>
+            <ul class="file-list" id="fileList"></ul>
+        </div>
+
+        <div class="download-section" id="downloadSection">
+            <h3>Invoice generated successfully!</h3>
+            <button class="btn" id="downloadBtn">Download Invoices (ZIP)</button>
+        </div>
+    </div>
+
+    <script>
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+        const salesTaxRateInput = document.getElementById('salesTaxRate');
+        const progressContainer = document.getElementById('progressContainer');
+        const progressFill = document.getElementById('progressFill');
+        const progressText = document.getElementById('progressText');
+        const timer = document.getElementById('timer');
+        const status = document.getElementById('status');
+        const fileInfo = document.getElementById('fileInfo');
+        const fileList = document.getElementById('fileList');
+        const downloadSection = document.getElementById('downloadSection');
+        const downloadBtn = document.getElementById('downloadBtn');
+        
+        // template upload
+        const templateUploadArea = document.getElementById('templateUploadArea');
+        const templateInput = document.getElementById('templateInput');
+        const templateStatus = document.getElementById('templateStatus');
+
+        let currentDownloadUrl = '';
+        let startTime = null;
+        let timerInterval = null;
+        let isProcessing = false; // prevent duplicate processing
+        let isTemplateProcessing = false; // prevent duplicate template processing
+
+        // drag and drop upload
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragover');
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            if (files.length > 0 && !isProcessing) {
+                handleFile(files[0]);
+            }
+        });
+
+        uploadArea.addEventListener('click', (e) => {
+            // prevent duplicate click
+            if (isProcessing) return;
+            
+            // ensure the click is on the upload area, not the file input
+            if (e.target === uploadArea || e.target.closest('.upload-icon') || 
+                e.target.closest('.upload-text') || e.target.closest('.upload-subtext')) {
+                fileInput.click();
+            }
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0 && !isProcessing) {
+                const file = e.target.files[0];
+                handleFile(file);
+            }
+        });
+
+        // template upload
+        templateUploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            templateUploadArea.classList.add('dragover');
+        });
+
+        templateUploadArea.addEventListener('dragleave', () => {
+            templateUploadArea.classList.remove('dragover');
+        });
+
+        templateUploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            templateUploadArea.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            if (files.length > 0 && !isTemplateProcessing) {
+                handleTemplateFile(files[0]);
+            }
+        });
+
+        templateUploadArea.addEventListener('click', (e) => {
+            // prevent duplicate click
+            if (isTemplateProcessing) return;
+            
+            // ensure the click is on the upload area, not the file input
+            if (e.target === templateUploadArea || e.target.closest('.upload-icon') || 
+                e.target.closest('.upload-text') || e.target.closest('.upload-subtext')) {
+                templateInput.click();
+            }
+        });
+
+        templateInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0 && !isTemplateProcessing) {
+                const file = e.target.files[0];
+                handleTemplateFile(file);
+            }
+        });
+
+        function startTimer() {
+            startTime = Date.now();
+            timerInterval = setInterval(updateTimer, 1000);
+        }
+
+        function stopTimer() {
+            if (timerInterval) {
+                clearInterval(timerInterval);
+                timerInterval = null;
+            }
+        }
+
+        function updateTimer() {
+            if (startTime) {
+                const elapsed = Math.floor((Date.now() - startTime) / 1000);
+                const minutes = Math.floor(elapsed / 60);
+                const seconds = elapsed % 60;
+                timer.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            }
+        }
+
+        function handleFile(file) {
+            // prevent duplicate processing
+            if (isProcessing) return;
+            
+            // check file type
+            if (!file.name.match(/\.(xlsx|xls)$/i)) {
+                showStatus('Please select an Excel file (.xlsx or .xls)', 'error');
+                return;
+            }
+
+            // validate tax rate input
+            const taxRate = parseFloat(salesTaxRateInput.value);
+            if (isNaN(taxRate) || taxRate < 0 || taxRate > 100) {
+                showStatus('Please input a valid sales tax rate (0-100%)', 'error');
+                return;
+            }
+
+            // set processing status
+            isProcessing = true;
+            
+            // add visual feedback to the upload area
+            uploadArea.classList.add('processing');
+
+            // show file information
+            showFileInfo(file, taxRate);
+            
+            // upload file
+            uploadFile(file, taxRate);
+        }
+
+        function showFileInfo(file, taxRate) {
+            fileInfo.style.display = 'block';
+            fileList.innerHTML = `
+                <li><strong>File Name：</strong>${file.name}</li>
+                <li><strong>File Size：</strong>${formatFileSize(file.size)}</li>
+                <li><strong>File Type：</strong>${file.type || 'Excel file'}</li>
+                <li><strong>Sales Tax Rate：</strong>${taxRate}%</li>
+            `;
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        function uploadFile(file, taxRate) {
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('sales_tax_rate', taxRate / 100); // convert to decimal
+
+            // show progress bar and start timer
+            progressContainer.style.display = 'block';
+            progressFill.style.width = '0%';
+            progressText.innerHTML = '<span class="loading"></span>Uploading file...';
+            hideStatus();
+            startTimer();
+
+            // simulate upload progress
+            let progress = 0;
+            const progressInterval = setInterval(() => {
+                progress += Math.random() * 30;
+                if (progress > 90) progress = 90;
+                progressFill.style.width = progress + '%';
+            }, 200);
+
+            fetch('/upload', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => {
+                return response.json();
+            })
+            .then(data => {
+                clearInterval(progressInterval);
+                progressFill.style.width = '100%';
+                progressText.textContent = 'Processing completed!';
+                stopTimer();
+
+                if (data.error) {
+                    showStatus(data.error, 'error');
+                } else {
+                    // show processing time
+                    const processingTime = data.processing_time || timer.textContent;
+                    showStatus(`${data.message} (Processing time: ${processingTime})`, 'success');
+                    showDownloadSection(data);
+                }
+            })
+            .catch(error => {
+                clearInterval(progressInterval);
+                stopTimer();
+                showStatus('Upload failed: ' + error.message, 'error');
+            })
+            .finally(() => {
+                // reset processing status
+                isProcessing = false;
+                
+                // remove visual feedback from the upload area
+                uploadArea.classList.remove('processing');
+                
+                // clear file input, allow re-selecting the same file
+                fileInput.value = '';
+                
+                setTimeout(() => {
+                    progressContainer.style.display = 'none';
+                }, 3000);
+            });
+        }
+
+        function showStatus(message, type) {
+            status.textContent = message;
+            status.className = `status ${type}`;
+            status.style.display = 'block';
+        }
+
+        function hideStatus() {
+            status.style.display = 'none';
+        }
+
+        function showDownloadSection(data) {
+            downloadSection.style.display = 'block';
+            currentDownloadUrl = data.download_url;
+            
+            // update file list
+            if (data.generated_files && data.generated_files.length > 0) {
+                fileList.innerHTML += '<li><strong>Documents Generated：</strong></li>';
+                data.generated_files.forEach(file => {
+                    const fileType = file.endsWith('.docx') ? '📝 Word' : '📄 Unknown';
+                    fileList.innerHTML += `<li>• ${file} (${fileType})</li>`;
+                });
+                
+                // show file type description
+                if (data.file_types && data.file_types.length > 0) {
+                    const typeText = data.file_types.includes('Word') ? 
+                        'Documents are provided in Word format, you can open them with Microsoft Word or other document editors.' : '';
+                    if (typeText) {
+                        fileList.innerHTML += `<li style="color: #856404; font-style: italic;">${typeText}</li>`;
+                    }
+                }
+            }
+        }
+
+        downloadBtn.addEventListener('click', () => {
+            if (currentDownloadUrl) {
+                window.location.href = currentDownloadUrl;
+            }
+        });
+
+        // check service status when page loads
+        window.addEventListener('load', () => {
+            fetch('/health')
+                .then(response => response.json())
+                .then(data => {
+                    // service is normal, no need to show any information
+                })
+                .catch(error => {
+                    showStatus('Cannot connect to server, please ensure the backend service is running', 'error');
+                });
+            
+            // check template status
+            checkTemplateStatus();
+        });
+
+        // check template status
+        function checkTemplateStatus() {
+            fetch('/template/status')
+                .then(response => response.json())
+                .then(data => {
+                    updateTemplateStatus(data);
+                })
+                .catch(error => {
+                    console.error('Failed to check template status:', error);
+                });
+        }
+
+        // update template status display
+        function updateTemplateStatus(data) {
+            const statusInfo = templateStatus.querySelector('.status-info');
+            if (data.has_custom_template) {
+                statusInfo.innerHTML = `
+                    <span class="status-text">Custom template uploaded</span>
+                `;
+                templateStatus.style.backgroundColor = '#d4edda';
+                templateStatus.style.border = '1px solid #c3e6cb';
+            } else {
+                statusInfo.innerHTML = `
+                    <span class="status-text">Using default template</span>
+                `;
+                templateStatus.style.backgroundColor = '#f8f9fa';
+                templateStatus.style.border = '1px solid #e9ecef';
+            }
+        }
+
+        // handle template file upload
+        function handleTemplateFile(file) {
+            // prevent duplicate processing
+            if (isTemplateProcessing) return;
+            
+            // check file type
+            if (!file.name.match(/\.docx$/i)) {
+                showStatus('Please select a Word document file (.docx)', 'error');
+                return;
+            }
+
+            // set processing status
+            isTemplateProcessing = true;
+            
+            // add visual feedback to the upload area
+            templateUploadArea.classList.add('processing');
+
+            // upload template file
+            uploadTemplateFile(file);
+        }
+
+        // upload template file
+        function uploadTemplateFile(file) {
+            const formData = new FormData();
+            formData.append('template', file);
+
+            showStatus('Uploading template file...', 'info');
+
+            fetch('/upload/template', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => {
+                return response.json();
+            })
+            .then(data => {
+                if (data.error) {
+                    showStatus(data.error, 'error');
+                } else {
+                    showStatus(data.message, 'success');
+                    // update template status
+                    checkTemplateStatus();
+                }
+            })
+            .catch(error => {
+                showStatus('Upload template failed: ' + error.message, 'error');
+            })
+            .finally(() => {
+                // reset processing status
+                isTemplateProcessing = false;
+                
+                // remove visual feedback from the upload area
+                templateUploadArea.classList.remove('processing');
+                
+                // clear file input
+                templateInput.value = '';
+            });
+        }
+
+        // template download function
+        function downloadTemplate(type) {
+            const url = type === 'format' ? '/download/template/format' : '/download/template/info';
+            const filename = type === 'format' ? 'invoice_format_template.docx' : 'invoice_info_template.xlsx';
+            
+            // show download status
+            showStatus(`Downloading ${type === 'format' ? 'Invoice format template' : 'Invoice info template'}...`, 'info');
+            
+            // create download link
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = filename;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            // show success message
+            setTimeout(() => {
+                showStatus(`${type === 'format' ? 'Invoice format template' : 'Invoice info template'} downloaded successfully!`, 'success');
+            }, 1000);
+        }
+    </script>
+</body>
+</html> 
