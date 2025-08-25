@@ -41,7 +41,7 @@ Core Logic:
 - [`utils/`](https://github.com/leopengningchuan/personal_utils) – submodule used
 - `invoice_info.py` – python script for getting invoice information
 - `invoice_automation.ipynb` – notebook for invoice generation
-- `assets`: – supporting resource files
+- `assets/`: – supporting resource files
   - `template_invoice_format.docx` – invoice format template DOCX
   - `template_invoice_info.xlsx` – invoice info template XLSX
   - `invoice_format_sample.docx` – invoice format sample DOCX
@@ -53,7 +53,7 @@ Online Deployment:
 - `Procfile` – declares how to run the app in production
 - `requirements.txt` – required Python dependencies
 - `app.py` – backend server
-- `templates`: – frontend HTML templates
+- `templates/`: – frontend HTML templates
   - `index.html` – main HTML form interface
 
 
